@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "module": "commonjs",
+    "jsx": "react",
+    "declaration": true,
+    "sourceMap": true,
+    "outDir": "./release",
+    "removeComments": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "strictPropertyInitialization": false
+  },
+  "exclude": [
+    "node_modules"
+  ],
+  "include": [
+    "src/**/*",
+    "tests/**/*",
+    "*.ts",
+    "*.js"
+  ]
+}

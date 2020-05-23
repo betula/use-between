@@ -1,0 +1,68 @@
+{
+  "name": "use-between",
+  "version": "0.0.1",
+  "description": "How to use React hooks between components",
+  "repository": {
+    "url": "https://github.com/betula/use-between"
+  },
+  "bugs": {
+    "url": "https://github.com/betula/use-between/issues"
+  },
+  "license": "MIT",
+  "scripts": {
+    "build": "npx rollup -c",
+    "dev": "npx rollup -cw",
+    "test": "npx jest --coverage --passWithNoTests",
+    "lint": "npx eslint ./src --ext ts && npx eslint ./tests --ext ts,tsx",
+    "clean": "npx rimraf ./release && npx rimraf ./coverage",
+    "lerna:reset": "npm run lerna:clean && npx lerna clean --yes && npm run lerna:bootstrap",
+    "lerna:update": "npx lerna bootstrap --no-ci",
+    "lerna:bootstrap": "npx lerna bootstrap --no-ci && npm run lerna:build && npm run lerna:test && npm run lerna:lint",
+    "lerna:build": "npx lerna run build",
+    "lerna:test": "npx lerna run test",
+    "lerna:lint": "npx lerna run lint",
+    "lerna:clean": "npx lerna run clean",
+    "lerna:publish": "npm run lerna:clean && npm run lerna:lint && npm run lerna:build && npm run lerna:test && npx lerna publish"
+  },
+  "author": "Slava Bereza <mail@betula.co> (http://betula.co)",
+  "keywords": [
+    "use between hook"
+  ],
+  "source": "./src/index.ts",
+  "main": "./release/index.js",
+  "module": "./release/index.esm.js",
+  "types": "./release/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "/release"
+  ],
+  "peerDependencies": {
+    "react": ">=16.8.0"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.8.4",
+    "@babel/preset-react": "^7.8.3",
+    "@babel/preset-typescript": "^7.8.3",
+    "@types/enzyme": "^3.10.4",
+    "@types/enzyme-adapter-react-16": "^1.0.5",
+    "@types/jest": "^25.1.1",
+    "@types/node": "^13.7.0",
+    "@types/react": "^16.9.26",
+    "@types/react-dom": "^16.9.5",
+    "@typescript-eslint/eslint-plugin": "^2.18.0",
+    "@typescript-eslint/parser": "^2.18.0",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.2",
+    "eslint": "^6.8.0",
+    "jest": "^25.1.0",
+    "lerna": "^3.20.2",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "rollup": "^1.31.0",
+    "rollup-plugin-typescript2": "^0.25.3",
+    "typescript": "^3.7.5"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
