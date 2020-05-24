@@ -1,4 +1,4 @@
-module.exports = {
+{
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
@@ -13,10 +13,10 @@ module.exports = {
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
 		"project": "tsconfig.eslint.json",
-		"tsconfigRootDir": ".",
+		"tsconfigRootDir": "."
 	},
   "plugins": ["@typescript-eslint"],
   "rules": {
     "@typescript-eslint/explicit-function-return-type": 0
-  },
-};
+  }
+}
