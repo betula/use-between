@@ -1,7 +1,7 @@
 # use-between
 
-Then you want to separate your React hooks state between several components its can be very difficult, because all context data stored in React component function area.
-If you want to share some of control functions to another component your need pass It thought component props. But If you want to share It with sibling one level component or some of set different components, you will be frustrated.
+When you want to separate your React hooks state between several components it's can be very difficult, because all context data stored in React component function area.
+If you want to share some of state parts or control functions to another component your need pass It thought React component props. But If you want to share It with sibling one level component or some of set different components, you will be frustrated.
 
 `use-between` it's a decision of your problem)
 
