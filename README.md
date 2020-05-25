@@ -3,7 +3,7 @@
 When you want to separate your React hooks between several components it's can be very difficult, because all context data stored in React component function area.
 If you want to share some of state parts or control functions to another component your need pass It thought React component props. But If you want to share It with sibling one level components or a set of scattered components, you will be frustrated.
 
-`useBetween` hook is the solution to your problem:kissing_closed_eyes:
+`useBetween` hook is the solution to your problem :kissing_closed_eyes:
 
 ```javascript
 // App.jsx
@@ -53,3 +53,10 @@ export default App
 
 If you like this idea and would like to use it, please put star in github. It will be your first commit!
 
+### Install
+
+```bash
+npm i --save use-between
+# or
+yarn add use-between
+```
