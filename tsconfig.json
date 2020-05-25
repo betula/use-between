@@ -12,11 +12,15 @@
     "strictPropertyInitialization": false
   },
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "examples/*/node_modules"
   ],
   "include": [
     "src/**/*",
     "tests/**/*",
+    "examples/**/*.ts",
+    "examples/**/*.tsx",
+    "examples/*/*.js",
     "*.ts",
     "*.js"
   ]

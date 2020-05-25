@@ -15,11 +15,11 @@ const useCurrencyStore = () => {
   const [ euros, setEuros ] = useState(0)
 
   useEffect(() => {
-    setDollars(euros * 1.1)
+    setDollars(euros * 2)
   }, [euros])
 
   useEffect(() => {
-    setEuro(dollars / 1.1)
+    setEuros(dollars / 2)
   }, [dollars])
 
   return {
@@ -47,8 +47,9 @@ const App = () => (
   </>
 )
 
-export default App;
+export default App
 ```
+[![Example on codesandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/betula/use-between/tree/master/examples/basic-usage)
 
 If you like this idea and would like to use it, please put star in github. It will be your first commit!
 

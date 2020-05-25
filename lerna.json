@@ -1,8 +1,10 @@
 {
   "version": "0.0.5",
   "packages": [
-    "."
+    ".",
+    "examples/**/*"
   ],
   "npmClient": "npm",
+  "hoist": true,
   "loglevel": "verbose"
 }
