@@ -1,6 +1,6 @@
 {
   "name": "use-between",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "How to use React hooks between components",
   "repository": {
     "url": "https://github.com/betula/use-between"
