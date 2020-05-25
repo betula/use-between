@@ -1,66 +1,54 @@
 # use-between
 
-When you want to separate your React hooks state between several components it's can be very difficult, because all context data stored in React component function area.
-If you want to share some of state parts or control functions to another component your need pass It thought React component props. But If you want to share It with sibling one level component or some of set different components, you will be frustrated.
+When you want to separate your React hooks between several components it's can be very difficult, because all context data stored in React component function area.
+If you want to share some of state parts or control functions to another component your need pass It thought React component props. But If you want to share It with sibling one level components or a set of scattered components, you will be frustrated.
 
-`use-between` it's a decision of your problem)
+The `useBetween` hook it's the decision of your problem)
 
 ```javascript
-import { useState, useEffect } from 'react';
-import { useBetween, Between } from 'use-between';
+// App.jsx
+import React, { useState, useEffect } from 'react'
+import { useBetween } from 'use-between'
 
-const useTodos = () => {
-  const [ todos, setTodos ] = useState([]);
-  const [ loading, setLoading ] = useState(false);
-  const [ count, setCount ] = useState(0);
-
-  const load = async () => {
-    setLoading(true);
-    setTodos(await (await fetch('/api/todos')).json());
-    setLoading(false);
-  };
+const useCurrencyStore = () => {
+  const [ dollars, setDollars ] = useState(0)
+  const [ euros, setEuros ] = useState(0)
 
   useEffect(() => {
-    setCount(todos.length);
-  }, [todo]);
+    setDollars(euros * 1.1)
+  }, [euros])
+
+  useEffect(() => {
+    setEuro(dollars / 1.1)
+  }, [dollars])
 
   return {
-    todos,
-    loading,
-    count,
-    load
-  };
-};
+    dollars,
+    euros,
+    setDollars,
+    setEuros
+  }
+}
 
-const Todos = () => {
-  const { todos, count } = useBetween(useTodos);
-  return (
-    <>
-      {todos.map((todo) => <div>{todo.title}</div>)}
-      Count: {count}
-    </>
-  );
-};
+const DollarInput = () => {
+  const { dollars, setDollars } = useBetween(useCurrencyStore)
+  return <input value={dollars} onChange={ev => setDollars(ev.target.value)} />
+}
 
-const App = () => {
-  const { loading, load } = useBetween(useTodos);
-  return (
-    loading
-      ? <>'Loading...'</>
-      : (
-        <>
-          <Todos />
-          <button onClick={load}>Load</button>
-        </>
-      )
-  );
-};
+const EuroInput = () => {
+  const { euros, setEuros } = useBetween(useCurrencyStore)
+  return <input value={euros} onChange={ev => setEuros(ev.target.value)} />
+}
 
-const Root = () => (
-  <Between>
-    <App />
-  </Between>
-);
+const App = () => (
+  <>
+    <DollarInput />
+    <EuroInput />
+  </>
+)
+
+export default App;
 ```
 
-If you like this idea and would like to use it, please put a star in github. It will inspire me!
+If you like this idea and would like to use it, please put star in github. It will be your first commit!
+
