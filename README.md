@@ -55,6 +55,25 @@ export default App
 
 If you like this idea and would like to use it, please put star in github. It will be your first commit!
 
+### Supported hooks
+
+```diff
++ useState - ready
++ useEffect - ready
+
+# useReducer - coming soon
+# useCallback - coming soon
+# useContext - coming soon
+# useImperativeHandle - coming soon
+# useLayoutEffect - coming soon
+# useMemo - coming soon
+# useRef - coming soon
+# useDebugValue - coming soon
+# useResponder - coming soon
+# useDeferredValue - coming soon
+# useTransition - coming soon
+```
+
 ### Install
 
 ```bash
