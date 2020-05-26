@@ -1,6 +1,6 @@
 {
   "name": "basic-usage",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "private": true,
   "dependencies": {
     "@types/node": "^14.0.5",
@@ -10,7 +10,7 @@
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
     "typescript": "^3.9.3",
-    "use-between": "^0.0.7"
+    "use-between": "^0.0.8"
   },
   "scripts": {
     "start": "react-scripts start"
