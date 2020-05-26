@@ -6,6 +6,8 @@ type Hook<T> = () => T
 
 const stores = new Map<any, any>()
 
+const equals = (a: any, b: any) => Object.is(a, b);
+
 const factory = (hook: any) => {
   const boxes = [] as any[]
   let subscribers = [] as any[]
@@ -41,12 +43,13 @@ const factory = (hook: any) => {
       const box = next()
 
       if (!box.initialized) {
-        box.state = initialState
+        box.state = typeof initialState === "function" ? initialState() : initialState
+
         box.set = (fn: any) => {
           if (typeof fn === 'function') {
             return box.set(fn(box.state))
           }
-          if (fn !== box.state) {
+          if (!equals(fn, box.state)) {
             box.state = fn
             nextTick()
           }
@@ -67,7 +70,7 @@ const factory = (hook: any) => {
       else {
         if (
           box.deps.length !== deps.length ||
-          box.deps.some((dep: any, index: any) => dep !== deps[index])
+          box.deps.some((dep: any, index: any) => !equals(dep, deps[index]))
         ) {
           useEffectQueue.push(() => {
             box.deps = deps
@@ -85,7 +88,7 @@ const factory = (hook: any) => {
 
         box.dispatch = (action: any) => {
           const state = reducer(box.state, action)
-          if (state !== box.state) {
+          if (!equals(state, box.state)) {
             box.state = state
             nextTick()
           }
