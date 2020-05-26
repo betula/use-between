@@ -60,8 +60,8 @@ If you like this idea and would like to use it, please put star in github. It wi
 ```diff
 + useState - ready
 + useEffect - ready
++ useReducer - ready
 
-# useReducer - coming soon
 # useCallback - coming soon
 # useContext - coming soon
 # useImperativeHandle - coming soon
@@ -76,7 +76,7 @@ If you like this idea and would like to use it, please put star in github. It wi
 
 ### Install
 
-```bash
+```sh
 npm i --save use-between
 # or
 yarn add use-between

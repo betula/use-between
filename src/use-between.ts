@@ -24,6 +24,14 @@ const factory = (hook: any) => {
     let tickBody = true
     const useEffectQueue = [] as any[]
 
+    const nextTick = () => {
+      if (tickBody) {
+        tickAgain = true
+      } else {
+        tick()
+      }
+    }
+
     const next = () => {
       const index = pointer ++
       return (boxes[index] = boxes[index] || {})
@@ -40,11 +48,7 @@ const factory = (hook: any) => {
           }
           if (fn !== box.state) {
             box.state = fn
-            if (tickBody) {
-              tickAgain = true
-            } else {
-              tick()
-            }
+            nextTick()
           }
         }
         box.initialized = true
@@ -71,6 +75,25 @@ const factory = (hook: any) => {
           })
         }
       }
+    }
+
+    current.useReducer = (reducer: any, initialState?: any, init?: any) => {
+      const box = next()
+
+      if (!box.initialized) {
+        box.state = init ? init(initialState) : initialState
+
+        box.dispatch = (action: any) => {
+          const state = reducer(box.state, action)
+          if (state !== box.state) {
+            box.state = state
+            nextTick()
+          }
+        }
+        box.initialized = true
+      }
+
+      return [ box.state, box.dispatch ]
     }
 
     ReactCurrentDispatcher.current = current
