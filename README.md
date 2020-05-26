@@ -1,5 +1,7 @@
 # use-between
 
+[![npm](https://img.shields.io/npm/v/use-between?style=flat-square)](https://www.npmjs.com/package/use-between) [![npm bundle size](https://img.shields.io/bundlephobia/minzip/use-between?style=flat-square)](https://bundlephobia.com/result?p=use-between)
+
 When you want to separate your React hooks between several components it's can be very difficult, because all context data stored in React component function area.
 If you want to share some of state parts or control functions to another component your need pass It thought React component props. But If you want to share It with sibling one level components or a set of scattered components, you will be frustrated.
 
