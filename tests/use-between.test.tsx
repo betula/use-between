@@ -1,8 +1,8 @@
-import React, { useState, useReducer } from 'react'
+import React, { useState, useReducer, useEffect } from 'react'
 import { mount } from 'enzyme'
 import { useBetween } from '../src'
 
-test('Should update component with useState', () => {
+test('Should work useState hook', () => {
   const useStore = () => useState(0)
 
   const A = () => <i>{useBetween(useStore)[0]}</i>
@@ -19,7 +19,42 @@ test('Should update component with useState', () => {
   expect(el.find('i').text()).toBe('2')
 });
 
-test('Should update component with useReducer', () => {
+test('Should work useEffect hook', () => {
+  const useStore = () => {
+    const [ a, setA ] = useState(0)
+    const [ b, setB ] = useState(0)
+    useEffect(() => { setA(b * 2) }, [b])
+    useEffect(() => { setB(a / 2) }, [a])
+    return { a, b, setA, setB }
+  }
+  const A = () => {
+    const { a, setA } = useBetween(useStore)
+    return <><i>{a}</i><button onClick={() => setA(10)} /></>
+  }
+  const B = () => {
+    const { b, setB } = useBetween(useStore)
+    return <><i>{b}</i><button onClick={() => setB(10)} /></>
+  }
+  const el = mount(<><A /><B /></>)
+  const a = () => el.find(A).find('i').text()
+  const b = () => el.find(B).find('i').text()
+  const setA = () => el.find(A).find('button').simulate('click')
+  const setB = () => el.find(B).find('button').simulate('click')
+
+  expect(a()).toBe('0')
+  expect(b()).toBe('0')
+  setA()
+  expect(a()).toBe('10')
+  expect(b()).toBe('5')
+  setB()
+  expect(a()).toBe('20')
+  expect(b()).toBe('10')
+  setA()
+  expect(a()).toBe('10')
+  expect(b()).toBe('5')
+});
+
+test('Should work useReducer hook', () => {
   const initialState = { count: 0 }
   const reducer = (state: typeof initialState, action: { type: string }) => {
     switch (action.type) {
