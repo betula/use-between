@@ -1,4 +1,4 @@
-import React from 'react'
+import * as React from 'react'
 
 type AnyHook = (...args: any[]) => any;
 type ReactSharedInternalsType = {

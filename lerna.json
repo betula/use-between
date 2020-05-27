@@ -2,6 +2,5 @@
   "version": "0.0.9",
   "packages": [ "." ],
   "npmClient": "npm",
-  "hoist": true,
   "loglevel": "verbose"
 }

@@ -1,27 +1,11 @@
 {
   "compilerOptions": {
     "target": "es2017",
-    "module": "commonjs",
+    "module": "esnext",
     "jsx": "react",
     "declaration": true,
-    "sourceMap": true,
     "outDir": "./release",
-    "removeComments": true,
-    "strict": true,
-    "esModuleInterop": true,
-    "strictPropertyInitialization": false
+    "strict": true
   },
-  "exclude": [
-    "node_modules",
-    "examples/*/node_modules"
-  ],
-  "include": [
-    "src/**/*",
-    "tests/**/*",
-    "examples/**/*.ts",
-    "examples/**/*.tsx",
-    "examples/*/*.js",
-    "*.ts",
-    "*.js"
-  ]
+  "include": ["src"]
 }

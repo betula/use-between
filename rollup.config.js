@@ -12,9 +12,5 @@ export default {
     format: 'es'
   }],
   external: Object.keys(peerDependencies),
-  plugins: [
-    typescript({
-      tsconfig: './tsconfig.release.json'
-    })
-  ]
+  plugins: [ typescript() ]
 }
