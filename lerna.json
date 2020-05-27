@@ -1,6 +1,8 @@
 {
-  "version": "0.0.9",
-  "packages": [ "." ],
+  "version": "0.0.10",
+  "packages": [
+    "."
+  ],
   "npmClient": "npm",
   "loglevel": "verbose"
 }
