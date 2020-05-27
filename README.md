@@ -51,7 +51,7 @@ const App = () => (
 
 export default App
 ```
-[![Example on codesandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/betula/use-between/tree/master/examples/basic-usage)
+[![Example on codesandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/flamboyant-knuth-7qxhj?fontsize=14&hidenavigation=1&theme=dark)
 
 If you like this idea and would like to use it, please put star in github. It will be your first contribution!
 
