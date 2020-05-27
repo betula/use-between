@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useEffect } from 'react'
+import React, { useState, useReducer, useEffect, useCallback } from 'react'
 import { mount } from 'enzyme'
 import { useBetween } from '../src'
 
@@ -94,4 +94,40 @@ test('Should work useReducer hook', () => {
   inc()
   inc()
   expect(text()).toBe('1')
+});
+
+test('Should work useCallback hook', () => {
+  let lastFn: any
+  const fns = []
+  const useStore = () => {
+    const [ a, setA ] = useState(0)
+    const [ , setB ] = useState(0)
+    const f = () => null
+    fns.push(f)
+    const fn = useCallback(f, [a])
+    lastFn = fn
+    return [ fn, setA, setB ]
+  }
+
+  const A = () => {
+    const [ , setA, setB ] = useBetween(useStore)
+    return <>
+      <button onClick={() => setA(x => x + 1)} />
+      <button onClick={() => setB(x => x + 1)} />
+    </>
+  }
+
+  const el = mount(<A />)
+  const setA = () => el.find('button').at(0).simulate('click')
+  const setB = () => el.find('button').at(1).simulate('click')
+
+  expect(fns.length).toBe(1)
+  expect(fns[0] === lastFn).toBeTruthy()
+  setB()
+  expect(fns.length).toBe(2)
+  expect(fns[0] === lastFn).toBeTruthy()
+  expect(fns[1] === lastFn).toBeFalsy()
+  setA()
+  expect(fns.length).toBe(3)
+  expect(fns[2] === lastFn).toBeTruthy()
 });

@@ -9,60 +9,61 @@ If you want to share some of state parts or control functions to another compone
 
 ```javascript
 // App.jsx
-import React, { useState, useEffect } from 'react'
-import { useBetween } from 'use-between'
+import React, { useState, useCallback } from 'react';
+import { useBetween } from 'use-between';
 
-const useCurrencyStore = () => {
-  const [ dollars, setDollars ] = useState(0)
-  const [ euros, setEuros ] = useState(0)
-
-  useEffect(() => {
-    setDollars(euros * 2)
-  }, [euros])
-
-  useEffect(() => {
-    setEuros(dollars / 2)
-  }, [dollars])
-
+const useCounterStore = () => {
+  const [count, setCount] = useState(0);
+  const inc = useCallback(() => setCount(c => c + 1), []);
+  const dec = useCallback(() => setCount(c => c - 1), []);
   return {
-    dollars,
-    euros,
-    setDollars,
-    setEuros
-  }
-}
+    count,
+    inc,
+    dec
+  };
+};
 
-const DollarInput = () => {
-  const { dollars, setDollars } = useBetween(useCurrencyStore)
-  return <input value={dollars} onChange={ev => setDollars(ev.target.value)} />
-}
+const Count = () => {
+  const { count } = useBetween(useCounterStore);
+  return <p>{count}</p>;
+};
 
-const EuroInput = () => {
-  const { euros, setEuros } = useBetween(useCurrencyStore)
-  return <input value={euros} onChange={ev => setEuros(ev.target.value)} />
-}
+const Buttons = () => {
+  const { inc, dec } = useBetween(useCounterStore);
+  return (
+    <>
+      <button onClick={inc}>+</button>
+      <button onClick={dec}>-</button>
+    </>
+  );
+};
 
 const App = () => (
   <>
-    <DollarInput />
-    <EuroInput />
+    <Count />
+    <Buttons />
+    <Count />
+    <Buttons />
   </>
-)
+);
 
-export default App
+export default App;
 ```
 [![Example on codesandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/flamboyant-knuth-7qxhj?fontsize=14&hidenavigation=1&theme=dark)
+
+`useBetween` is a way to call any hook. But so that the state will not be stored in the React component. For the same hook, the result of the call will be the same. So we can call one hook in different components and work together on one state. When updating the shared state, each component using it will be updated too.
 
 If you like this idea and would like to use it, please put star in github. It will be your first contribution!
 
 ### Supported hooks
 
 ```diff
-+ useState - ready
-+ useEffect - ready
++ useCallback - ready
 + useReducer - ready
++ useState - ready
 
-# useCallback - coming soon
++ useEffect - partial support
+
 # useContext - coming soon
 # useImperativeHandle - coming soon
 # useLayoutEffect - coming soon
@@ -76,7 +77,7 @@ If you like this idea and would like to use it, please put star in github. It wi
 
 ### Install
 
-```sh
+```bash
 npm i --save use-between
 # or
 yarn add use-between
