@@ -1,11 +1,22 @@
-import React, { useState, useReducer, useEffect, useCallback } from 'react'
+import React, {
+  useState,
+  useReducer,
+  useEffect,
+  useCallback,
+  useLayoutEffect,
+  useMemo,
+  useRef
+} from 'react'
 import { mount } from 'enzyme'
 import { useBetween } from '../src'
 
 test('Should work useState hook', () => {
   const useStore = () => useState(0)
 
-  const A = () => <i>{useBetween(useStore)[0]}</i>
+  const A = () => {
+    const [ a ] = useBetween(useStore)
+    return <i>{a}</i>
+  }
   const B = () => {
     const [ , set ] = useBetween(useStore)
     return <button onClick={() => set(x => x + 1)} />
@@ -20,11 +31,17 @@ test('Should work useState hook', () => {
 });
 
 test('Should work useEffect hook', () => {
+  const off = jest.fn()
   const useStore = () => {
     const [ a, setA ] = useState(0)
     const [ b, setB ] = useState(0)
-    useEffect(() => { setA(b * 2) }, [b])
-    useEffect(() => { setB(a / 2) }, [a])
+    useEffect(() => {
+      setA(b * 2)
+    }, [b])
+    useEffect(() => {
+      setB(a / 2)
+    }, [a])
+    useEffect(() => off, [])
     return { a, b, setA, setB }
   }
   const A = () => {
@@ -35,7 +52,8 @@ test('Should work useEffect hook', () => {
     const { b, setB } = useBetween(useStore)
     return <><i>{b}</i><button onClick={() => setB(10)} /></>
   }
-  const el = mount(<><A /><B /></>)
+  const C = () => <><A /><B /></>
+  const el = mount(<C />)
   const a = () => el.find(A).find('i').text()
   const b = () => el.find(B).find('i').text()
   const setA = () => el.find(A).find('button').simulate('click')
@@ -52,6 +70,10 @@ test('Should work useEffect hook', () => {
   setA()
   expect(a()).toBe('10')
   expect(b()).toBe('5')
+
+  expect(off).toBeCalledTimes(0)
+  el.unmount()
+  expect(off).toBeCalledTimes(1)
 });
 
 test('Should work useReducer hook', () => {
@@ -131,3 +153,111 @@ test('Should work useCallback hook', () => {
   expect(fns.length).toBe(3)
   expect(fns[2] === lastFn).toBeTruthy()
 });
+
+test('Should work useLayoutEffect hook', () => {
+  const [ fn1, fn2, fn3, fn4 ] = [ jest.fn(), jest.fn(), jest.fn(), jest.fn() ]
+  const [ un1, un2, un3, un4 ] = [ jest.fn(), jest.fn(), jest.fn(), jest.fn() ]
+  let i = 0
+  const useStore = () => {
+    useLayoutEffect(() => (fn1(i++), () => un1(i++)), [])
+    useEffect(() => (fn2(i++), () => un2(i++)), [])
+    useLayoutEffect(() => (fn3(i++), () => un3(i++)), [])
+    useEffect(() => (fn4(i++), () => un4(i++)), [])
+  }
+  const A = () => (useBetween(useStore), <a />)
+  const B = () => (useBetween(useStore), <b />)
+  const C = () => <><A /><B /></>
+  const el = mount(<C />)
+
+  expect(fn1).toBeCalledWith(0)
+  expect(fn3).toBeCalledWith(1)
+  expect(fn2).toBeCalledWith(2)
+  expect(fn4).toBeCalledWith(3)
+  expect(un1).toBeCalledTimes(0)
+  expect(un2).toBeCalledTimes(0)
+  expect(un3).toBeCalledTimes(0)
+  expect(un4).toBeCalledTimes(0)
+  el.unmount()
+  expect(fn1).toBeCalledTimes(1)
+  expect(fn2).toBeCalledTimes(1)
+  expect(fn3).toBeCalledTimes(1)
+  expect(fn4).toBeCalledTimes(1)
+  expect(un1).toBeCalledWith(4)
+  expect(un3).toBeCalledWith(5)
+  expect(un2).toBeCalledWith(6)
+  expect(un4).toBeCalledWith(7)
+});
+
+test('Should work useMemo hook', () => {
+  const fa = jest.fn();
+  const fb = jest.fn();
+
+  const useStore = () => {
+    const [ a, setA ] = useState(0)
+    const b = useMemo(() => (fa(a), a + 1), [a])
+    useMemo(() => fb(), [])
+    return { a, b, setA }
+  }
+
+  const A = () => {
+    const { b, setA } = useBetween(useStore)
+    return <>
+      <b>{b}</b>
+      <button onClick={() => setA(x => x + 1)} />
+    </>
+  }
+
+  const el = mount(<A />)
+  const setA = () => el.find('button').simulate('click')
+  const b = () => +el.find('b').text()
+
+  expect(fa).toBeCalledWith(0)
+  expect(fb).toBeCalledTimes(1)
+  expect(b()).toBe(1)
+  setA()
+  expect(fa).toBeCalledTimes(2)
+  expect(fa).toHaveBeenLastCalledWith(1)
+  expect(b()).toBe(2)
+  expect(fb).toBeCalledTimes(1)
+  setA()
+  setA()
+  expect(fa).toBeCalledTimes(4)
+  expect(fa).toHaveBeenLastCalledWith(3)
+  expect(b()).toBe(4)
+  expect(fb).toBeCalledTimes(1)
+});
+
+test('Should work useRef hook', () => {
+  const fn = jest.fn()
+  const useStore = () => {
+    const [v, set ] = useState(0)
+    fn(useRef(v))
+    return { set }
+  }
+  const A = () => {
+    const { set } = useBetween(useStore)
+    return <button onClick={() => set(v => v + 1)} />
+  }
+  const el = mount(<A />)
+  const inc = () => el.find('button').simulate('click')
+
+  expect(fn).toHaveBeenLastCalledWith({ current: 0 })
+  inc()
+  expect(fn).toHaveBeenLastCalledWith({ current: 0 })
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -11,16 +11,18 @@ const notImplemented = (name: string) => () => {
 }
 
 const equals = (a: any, b: any) => Object.is(a, b)
-const shallowArrayEquals = (a: any[], b: any[]) => (
-  a.length === b.length &&
-  a.every((dep: any, index: any) => equals(dep, b[index]))
+const shouldUpdate = (a: any[], b: any[]) => (
+  (!a || !b) ||
+  (a.length !== b.length) ||
+  a.some((dep: any, index: any) => !equals(dep, b[index]))
 )
 
-const stores = new Map<any, any>()
+const instances = new WeakMap<any, any>()
 
 let boxes = [] as any[]
 let pointer = 0
 let useEffectQueue = [] as any[]
+let useLayoutEffectQueue = [] as any[]
 let nextTick = () => {}
 
 const nextBox = () => {
@@ -35,7 +37,6 @@ const ownDisptacher = {
 
     if (!box.initialized) {
       box.state = typeof initialState === "function" ? initialState() : initialState
-
       box.set = (fn: any) => {
         if (typeof fn === 'function') {
           return box.set(fn(box.state))
@@ -57,7 +58,6 @@ const ownDisptacher = {
 
     if (!box.initialized) {
       box.state = init ? init(initialState) : initialState
-
       box.dispatch = (action: any) => {
         const state = reducer(box.state, action)
         if (!equals(state, box.state)) {
@@ -77,12 +77,23 @@ const ownDisptacher = {
     if (!box.initialized) {
       box.deps = deps
       box.initialized = true
+      useEffectQueue.push([box, deps, fn])
     }
-    else if (!shallowArrayEquals(box.deps, deps)) {
-      useEffectQueue.push(() => {
-        box.deps = deps
-        fn()
-      })
+    else if (shouldUpdate(box.deps, deps)) {
+      useEffectQueue.push([box, deps, fn])
+    }
+  },
+
+  useLayoutEffect: (fn: any, deps: any[]) => {
+    const box = nextBox()
+
+    if (!box.initialized) {
+      box.deps = deps
+      box.initialized = true
+      useLayoutEffectQueue.push([box, deps, fn])
+    }
+    else if (shouldUpdate(box.deps, deps)) {
+      useLayoutEffectQueue.push([box, deps, fn])
     }
   },
 
@@ -94,19 +105,43 @@ const ownDisptacher = {
       box.deps = deps
       box.initialized = true
     }
-    else if (!shallowArrayEquals(box.deps, deps)) {
+    else if (shouldUpdate(box.deps, deps)) {
       box.fn = fn
     }
 
     return box.fn
   },
 
+  useMemo: (fn: any, deps: any[]) => {
+    const box = nextBox()
+
+    if (!box.initialized) {
+      box.fn = fn
+      box.deps = deps
+      box.state = fn()
+      box.initialized = true
+    }
+    else if (shouldUpdate(box.deps, deps)) {
+      box.state = fn()
+    }
+
+    return box.state
+  },
+
+  useRef: (initialValue: any) => {
+    const box = nextBox()
+
+    if (!box.initialized) {
+      box.state = { current: initialValue }
+      box.initialized = true
+    }
+
+    return box.state
+  },
+
   readContext: notImplemented('readContext'),
   useContext: notImplemented('useContext'),
   useImperativeHandle: notImplemented('useImperativeHandle'),
-  useLayoutEffect: notImplemented('useLayoutEffect'),
-  useMemo: notImplemented('useMemo'),
-  useRef: notImplemented('useRef'),
   useDebugValue: notImplemented('useDebugValue'),
   useResponder: notImplemented('useResponder'),
   useDeferredValue: notImplemented('useDeferredValue'),
@@ -116,11 +151,12 @@ const ownDisptacher = {
 
 const factory = (hook: any) => {
   const scopedBoxes = [] as any[]
-  let subscribers = [] as any[]
+  let syncs = [] as any[]
   let state = undefined as any
+  let unsubs = [] as any[]
 
   const sync = () => {
-    subscribers.slice().forEach(fn => fn())
+    syncs.slice().forEach(fn => fn())
   }
 
   const tick = () => {
@@ -128,6 +164,7 @@ const factory = (hook: any) => {
     const originState = [
       pointer,
       useEffectQueue,
+      useLayoutEffectQueue,
       boxes,
       nextTick
     ] as any
@@ -137,6 +174,7 @@ const factory = (hook: any) => {
 
     pointer = 0
     useEffectQueue = []
+    useLayoutEffectQueue = []
     boxes = scopedBoxes
 
     nextTick = () => {
@@ -150,9 +188,31 @@ const factory = (hook: any) => {
     ReactCurrentDispatcher.current = ownDisptacher
     state = hook()
 
-    useEffectQueue.forEach(fn => fn())
+    ;[ useLayoutEffectQueue, useEffectQueue ].forEach(queue => (
+      queue.forEach(([box, deps, fn]) => {
+        box.deps = deps
+        if (box.unsub) {
+          const fn = box.unsub
+          unsubs = unsubs.filter(unsub => unsub !== fn)
+          fn()
+        }
+        const unsub = fn();
+        if (typeof unsub === "function") {
+          unsubs.push(unsub)
+          box.ubsub = unsub
+        } else {
+          box.unsub = null
+        }
+      })
+    ))
 
-    ;[ pointer, useEffectQueue, boxes, nextTick ] = originState
+    ;[
+      pointer,
+      useEffectQueue,
+      useLayoutEffectQueue,
+      boxes,
+      nextTick
+    ] = originState
     ReactCurrentDispatcher.current = originDispatcher
 
     tickBody = false
@@ -163,31 +223,38 @@ const factory = (hook: any) => {
     tick()
   }
 
-  const subscribe = (fn: any) => {
-    subscribers.push(fn)
-    return () => {
-      subscribers = subscribers.filter(f => f !== fn)
+  const sub = (fn: any) => {
+    syncs.push(fn)
+  }
+
+  const free = () => {
+    unsubs.slice().forEach(fn => fn())
+    instances.delete(hook)
+  }
+
+  const unsub = (fn: any) => {
+    syncs = syncs.filter(f => f !== fn)
+    if (syncs.length === 0) {
+      free()
     }
   }
 
-  const get = () => state
-  const init = () => tick()
-
   return {
-    subscribe,
-    get,
-    init
+    init: () => tick(),
+    get: () => state,
+    sub,
+    unsub,
   }
 }
 
 export const useBetween = <T>(hook: Hook<T>): T => {
   const forceUpdate = useForceUpdate()
-  let store = stores.get(hook)
-  if (!store) {
-    store = factory(hook)
-    stores.set(hook, store)
-    store.init()
+  let inst = instances.get(hook)
+  if (!inst) {
+    inst = factory(hook)
+    instances.set(hook, inst)
+    inst.init()
   }
-  useEffect(() => store.subscribe(forceUpdate), [store])
-  return store.get()
+  useEffect(() => (inst.sub(forceUpdate), () => inst.unsub(forceUpdate)), [inst])
+  return inst.get()
 }

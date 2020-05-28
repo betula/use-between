@@ -49,7 +49,7 @@ const App = () => (
 
 export default App;
 ```
-[![Example on codesandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/flamboyant-knuth-7qxhj?fontsize=14&hidenavigation=1&theme=dark)
+[![Edit Counter with useBetween](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/counter-with-usebetween-v0sji?fontsize=14&hidenavigation=1&theme=dark)
 
 `useBetween` is a way to call any hook. But so that the state will not be stored in the React component. For the same hook, the result of the call will be the same. So we can call one hook in different components and work together on one state. When updating the shared state, each component using it will be updated too.
 
@@ -57,18 +57,19 @@ If you like this idea and would like to use it, please put star in github. It wi
 
 ### Supported hooks
 
+Not for production use yet
+
 ```diff
 + useCallback - ready
++ useEffect - ready
++ useLayoutEffect - ready
++ useMemo - ready
 + useReducer - ready
++ useRef - ready
 + useState - ready
-
-+ useEffect - partial support
 
 # useContext - coming soon
 # useImperativeHandle - coming soon
-# useLayoutEffect - coming soon
-# useMemo - coming soon
-# useRef - coming soon
 # useDebugValue - coming soon
 # useResponder - coming soon
 # useDeferredValue - coming soon
