@@ -61,19 +61,16 @@ Not for production use yet
 
 ```diff
 + useCallback - ready
-+ useEffect - ready
-+ useLayoutEffect - ready
 + useMemo - ready
 + useReducer - ready
 + useRef - ready
 + useState - ready
 
++ useEffect - partial support
++ useImperativeHandle - partial support
++ useLayoutEffect - partial support
+
 # useContext - coming soon
-# useImperativeHandle - coming soon
-# useDebugValue - coming soon
-# useResponder - coming soon
-# useDeferredValue - coming soon
-# useTransition - coming soon
 ```
 
 ### Install

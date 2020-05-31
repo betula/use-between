@@ -31,7 +31,7 @@ const nextBox = () => {
 }
 
 const ownDisptacher = {
-  useState: (initialState?: any) => {
+  useState(initialState?: any) {
     const box = nextBox()
     const tick = nextTick;
 
@@ -52,7 +52,7 @@ const ownDisptacher = {
     return [ box.state, box.set ]
   },
 
-  useReducer: (reducer: any, initialState?: any, init?: any) => {
+  useReducer(reducer: any, initialState?: any, init?: any) {
     const box = nextBox()
     const tick = nextTick;
 
@@ -71,7 +71,7 @@ const ownDisptacher = {
     return [ box.state, box.dispatch ]
   },
 
-  useEffect: (fn: any, deps: any[]) => {
+  useEffect(fn: any, deps: any[]) {
     const box = nextBox()
 
     if (!box.initialized) {
@@ -84,7 +84,7 @@ const ownDisptacher = {
     }
   },
 
-  useLayoutEffect: (fn: any, deps: any[]) => {
+  useLayoutEffect(fn: any, deps: any[]) {
     const box = nextBox()
 
     if (!box.initialized) {
@@ -97,7 +97,7 @@ const ownDisptacher = {
     }
   },
 
-  useCallback: (fn: any, deps: any[]) => {
+  useCallback(fn: any, deps: any[]) {
     const box = nextBox()
 
     if (!box.initialized) {
@@ -112,11 +112,10 @@ const ownDisptacher = {
     return box.fn
   },
 
-  useMemo: (fn: any, deps: any[]) => {
+  useMemo(fn: any, deps: any[]) {
     const box = nextBox()
 
     if (!box.initialized) {
-      box.fn = fn
       box.deps = deps
       box.state = fn()
       box.initialized = true
@@ -128,7 +127,7 @@ const ownDisptacher = {
     return box.state
   },
 
-  useRef: (initialValue: any) => {
+  useRef(initialValue: any) {
     const box = nextBox()
 
     if (!box.initialized) {
@@ -139,15 +138,27 @@ const ownDisptacher = {
     return box.state
   },
 
-  readContext: notImplemented('readContext'),
-  useContext: notImplemented('useContext'),
-  useImperativeHandle: notImplemented('useImperativeHandle'),
-  useDebugValue: notImplemented('useDebugValue'),
-  useResponder: notImplemented('useResponder'),
-  useDeferredValue: notImplemented('useDeferredValue'),
-  useTransition: notImplemented('useTransition')
-}
+  useImperativeHandle(ref: any, fn: any, deps: any[]) {
+    const box = nextBox()
 
+    if (!box.initialized) {
+      box.deps = deps
+      box.initialized = true
+      useLayoutEffectQueue.push([box, deps, () => { ref.current = fn() }])
+    }
+    else if (shouldUpdate(box.deps, deps)) {
+      useLayoutEffectQueue.push([box, deps, () => { ref.current = fn() }])
+    }
+  }
+}
+;[
+  'readContext',
+  'useContext',
+  'useDebugValue',
+  'useResponder',
+  'useDeferredValue',
+  'useTransition'
+].forEach(key => (ownDisptacher as any)[key] = notImplemented(key))
 
 const factory = (hook: any) => {
   const scopedBoxes = [] as any[]
@@ -185,16 +196,16 @@ const factory = (hook: any) => {
       }
     }
 
-    ReactCurrentDispatcher.current = ownDisptacher
+    ReactCurrentDispatcher.current = ownDisptacher as any
     state = hook()
 
     ;[ useLayoutEffectQueue, useEffectQueue ].forEach(queue => (
       queue.forEach(([box, deps, fn]) => {
         box.deps = deps
         if (box.unsub) {
-          const fn = box.unsub
-          unsubs = unsubs.filter(unsub => unsub !== fn)
-          fn()
+          const unsub = box.unsub
+          unsubs = unsubs.filter(fn => fn !== unsub)
+          unsub()
         }
         const unsub = fn();
         if (typeof unsub === "function") {

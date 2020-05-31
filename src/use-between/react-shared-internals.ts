@@ -4,20 +4,7 @@ type AnyHook = (...args: any[]) => any;
 type ReactSharedInternalsType = {
   ReactCurrentDispatcher: {
     current?: {
-      readContext: AnyHook;
-      useCallback: AnyHook;
-      useContext: AnyHook;
-      useEffect: AnyHook;
-      useImperativeHandle: AnyHook;
-      useLayoutEffect: AnyHook;
-      useMemo: AnyHook;
-      useReducer: AnyHook;
-      useRef: AnyHook;
-      useState: AnyHook;
-      useDebugValue: AnyHook;
-      useResponder: AnyHook;
-      useDeferredValue: AnyHook;
-      useTransition: AnyHook;
+      [name: string]: AnyHook
     };
   };
 }

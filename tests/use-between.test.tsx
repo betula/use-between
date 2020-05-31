@@ -5,7 +5,8 @@ import React, {
   useCallback,
   useLayoutEffect,
   useMemo,
-  useRef
+  useRef,
+  useImperativeHandle
 } from 'react'
 import { mount } from 'enzyme'
 import { useBetween } from '../src'
@@ -246,18 +247,41 @@ test('Should work useRef hook', () => {
   expect(fn).toHaveBeenLastCalledWith({ current: 0 })
 });
 
+test('Should work useImperativeHandle hook', () => {
+  const fn = jest.fn()
+  const useStore = () => {
+    const [, setU] = useState(0)
+    const [v, setV] = useState(0)
+    const ref = useRef(5)
+    useImperativeHandle(ref, () => v, [v])
+    fn(ref.current)
+    return {
+      ref,
+      setU,
+      setV
+    }
+  }
+  const A = () => {
+    const { ref, setU, setV } = useBetween(useStore)
+    return (
+      <>
+        <i>{ref.current}</i>
+        <button onClick={() => setU(u => u + 1)} />
+        <button onClick={() => setV(v => v + 1)} />
+      </>
+    )
+  }
+  const el = mount(<A />)
+  const i = () => el.find('i').text()
+  const setU = () => el.find('button').at(0).simulate('click')
+  const setV = () => el.find('button').at(1).simulate('click')
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  expect(fn).toBeCalledWith(5)
+  expect(i()).toBe('0')
+  setV()
+  expect(i()).toBe('1')
+  setV()
+  expect(i()).toBe('2')
+  setU()
+  expect(i()).toBe('2')
+});
