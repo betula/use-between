@@ -80,6 +80,7 @@ const ownDisptacher = {
       useEffectQueue.push([box, deps, fn])
     }
     else if (shouldUpdate(box.deps, deps)) {
+      box.deps = deps
       useEffectQueue.push([box, deps, fn])
     }
   },
@@ -93,6 +94,7 @@ const ownDisptacher = {
       useLayoutEffectQueue.push([box, deps, fn])
     }
     else if (shouldUpdate(box.deps, deps)) {
+      box.deps = deps
       useLayoutEffectQueue.push([box, deps, fn])
     }
   },
@@ -106,6 +108,7 @@ const ownDisptacher = {
       box.initialized = true
     }
     else if (shouldUpdate(box.deps, deps)) {
+      box.deps = deps
       box.fn = fn
     }
 
@@ -121,6 +124,7 @@ const ownDisptacher = {
       box.initialized = true
     }
     else if (shouldUpdate(box.deps, deps)) {
+      box.deps = deps
       box.state = fn()
     }
 
@@ -147,6 +151,7 @@ const ownDisptacher = {
       useLayoutEffectQueue.push([box, deps, () => { ref.current = fn() }])
     }
     else if (shouldUpdate(box.deps, deps)) {
+      box.deps = deps
       useLayoutEffectQueue.push([box, deps, () => { ref.current = fn() }])
     }
   }
