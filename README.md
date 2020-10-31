@@ -73,6 +73,8 @@ Not for production use yet
 # useContext - coming soon
 ```
 
+If you found some bug or want to propose improvement please make an Issue. I would be happy for your help to make It better! :wink:
+
 ### Install
 
 ```bash
