@@ -60,7 +60,6 @@ If you like this idea and would like to use it, please put star in github. It wi
 ```diff
 + useState
 + useEffect
-
 + useReducer
 + useCallback
 + useMemo
