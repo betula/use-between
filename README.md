@@ -57,20 +57,18 @@ If you like this idea and would like to use it, please put star in github. It wi
 
 ### Supported hooks
 
-Not for production use yet
-
 ```diff
-+ useCallback - ready
-+ useMemo - ready
-+ useReducer - ready
-+ useRef - ready
-+ useState - ready
++ useCallback
++ useMemo
++ useReducer
++ useRef
++ useState
 
-+ useEffect - partial support
-+ useImperativeHandle - partial support
-+ useLayoutEffect - partial support
++ useEffect - compatible
++ useImperativeHandle - compatible
++ useLayoutEffect - compatible
 
-# useContext - coming soon
+# useContext - not supported
 ```
 
 If you found some bug or want to propose improvement please make an Issue. I would be happy for your help to make It better! :wink:
