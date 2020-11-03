@@ -86,4 +86,4 @@ npm i --save use-between
 yarn add use-between
 ```
 
-Cheers and happy coding! 👋
+Enjoy and happy coding!
