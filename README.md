@@ -58,12 +58,20 @@ If you like this idea and would like to use it, please put star in github. It wi
 ### Supported hooks
 
 ```diff
+Basic hooks:
 + useState
 + useEffect
+# useContext - not supported
+
+Additional hooks:
 + useReducer
 + useCallback
 + useMemo
 + useRef
++ useImperativeHandle - partial support
++ useLayoutEffect - partial support
+# useDebugValue - not supported
+
 ```
 
 If you found some bug or want to propose improvement please make an Issue. I would be happy for your help to make It better! :wink:
