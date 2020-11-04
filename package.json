@@ -24,15 +24,13 @@
   },
   "author": "Slava Bereza <mail@betula.co> (http://betula.co)",
   "keywords": [
-    "state",
     "model",
-    "functional",
-    "reactive",
-    "state management",
-    "data flow",
-    "hook",
-    "hooks",
-    "react-hooks"
+    "state",
+    "shared state",
+    "react hooks",
+    "react",
+    "javascript",
+    "typescript"
   ],
   "source": "./src/index.ts",
   "main": "./release/index.js",
