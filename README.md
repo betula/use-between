@@ -76,7 +76,8 @@ Additional hooks:
 
 If you found some bug or want to propose improvement please make an Issue. I would be happy for your help to make It better! :wink:
 
-[Try todos demo on codesandbox](https://codesandbox.io/s/todos-use-bettwen-8d2th?file=/src/components/todo-list.jsx)
+[How to use SSR](./docs/ssr.md)
+[Try Todos demo on codesandbox](https://codesandbox.io/s/todos-use-bettwen-8d2th?file=/src/components/todo-list.jsx)
 
 ### Install
 

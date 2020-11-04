@@ -285,3 +285,28 @@ test('Should work useImperativeHandle hook', () => {
   setU()
   expect(i()).toBe('2')
 });
+
+test('Should work useImperativeHandle hook with callback ref', () => {
+  const ref = jest.fn()
+  const useStore = () => {
+    const [v, setV] = useState(1)
+    useImperativeHandle(ref, () => v, [v])
+    return {
+      setV
+    }
+  }
+  const A = () => {
+    const { setV } = useBetween(useStore)
+    return (
+      <>
+        <button onClick={() => setV(v => v + 1)} />
+      </>
+    )
+  }
+  const el = mount(<A />)
+  const setV = () => el.find('button').at(0).simulate('click')
+
+  expect(ref).toBeCalledWith(1)
+  setV()
+  expect(ref).toHaveBeenLastCalledWith(2)
+});
