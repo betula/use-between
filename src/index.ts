@@ -273,7 +273,9 @@ const factory = (hook: any) => {
   }
 }
 
-export const useBetween = <T>(hook: (data?: unknown) => T): T => {
+type Hook<T> = (initialData?: any) => T;
+
+export const useBetween = <T>(hook: Hook<T>): T => {
   const forceUpdate = useForceUpdate()
   let inst = instances.get(hook)
   if (!inst) {
