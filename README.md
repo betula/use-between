@@ -65,6 +65,7 @@ If you like this idea and would like to use it, please put star in github. It wi
 + useCallback
 + useMemo
 + useRef
++ useImperativeHandle
 ```
 
 If you found some bug or want to propose improvement please make an Issue. I would be happy for your help to make It better! :wink:
