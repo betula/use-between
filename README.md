@@ -8,11 +8,10 @@ If you want to share some of state parts or control functions to another compone
 `useBetween` hook is the solution to your problem :kissing_closed_eyes:
 
 ```javascript
-// App.jsx
 import React, { useState, useCallback } from 'react';
 import { useBetween } from 'use-between';
 
-const useCounterStore = () => {
+const useCounter = () => {
   const [count, setCount] = useState(0);
   const inc = useCallback(() => setCount(c => c + 1), []);
   const dec = useCallback(() => setCount(c => c - 1), []);
@@ -23,13 +22,15 @@ const useCounterStore = () => {
   };
 };
 
+const useSharedCounter = () => useBetween(useCounter);
+
 const Count = () => {
-  const { count } = useBetween(useCounterStore);
+  const { count } = useSharedCounter();
   return <p>{count}</p>;
 };
 
 const Buttons = () => {
-  const { inc, dec } = useBetween(useCounterStore);
+  const { inc, dec } = useSharedCounter();
   return (
     <>
       <button onClick={inc}>+</button>
@@ -49,7 +50,7 @@ const App = () => (
 
 export default App;
 ```
-[![Edit Counter with useBetween](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/counter-with-usebetween-v0sji?fontsize=14&hidenavigation=1&theme=dark)
+[![Edit Counter with useBetween](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/counter-with-usebetween-zh4tp?file=/src/App.js)
 
 `useBetween` is a way to call any hook. But so that the state will not be stored in the React component. For the same hook, the result of the call will be the same. So we can call one hook in different components and work together on one state. When updating the shared state, each component using it will be updated too.
 
@@ -58,20 +59,12 @@ If you like this idea and would like to use it, please put star in github. It wi
 ### Supported hooks
 
 ```diff
-Basic hooks:
 + useState
 + useEffect
-# useContext - not supported
-
-Additional hooks:
 + useReducer
 + useCallback
 + useMemo
 + useRef
-+ useImperativeHandle - partial support
-+ useLayoutEffect - partial support
-# useDebugValue - not supported
-
 ```
 
 If you found some bug or want to propose improvement please make an Issue. I would be happy for your help to make It better! :wink:
