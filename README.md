@@ -76,7 +76,7 @@ If you found some bug or want to propose improvement please make an Issue. I wou
 ### Install
 
 ```bash
-npm i --save use-between
+npm install use-between
 # or
 yarn add use-between
 ```
