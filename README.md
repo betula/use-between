@@ -72,6 +72,7 @@ If you found some bug or want to propose improvement please make an Issue. I wou
 
 + [How to use SSR](./docs/ssr.md)
 + [Try Todos demo on CodeSandbox](https://codesandbox.io/s/todos-use-bettwen-8d2th?file=/src/components/todo-list.jsx)
++ [The article “Reuse React hooks in state sharing” on dev.to](https://dev.to/betula/reuse-react-hooks-in-state-sharing-1ell)
 
 ### Install
 
