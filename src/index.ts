@@ -225,7 +225,7 @@ const factory = (hook: any) => {
         const unsub = fn()
         if (typeof unsub === "function") {
           unsubs.push(unsub)
-          box.ubsub = unsub
+          box.unsub = unsub
         } else {
           box.unsub = null
         }
