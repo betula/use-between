@@ -74,7 +74,7 @@ test('Should work useEffect hook', () => {
 
   expect(off).toBeCalledTimes(0)
   el.unmount()
-  expect(off).toBeCalledTimes(1)
+  expect(off).toBeCalledTimes(0)
 });
 
 test('Should work useReducer hook', () => {
@@ -183,10 +183,10 @@ test('Should work useLayoutEffect hook', () => {
   expect(fn2).toBeCalledTimes(1)
   expect(fn3).toBeCalledTimes(1)
   expect(fn4).toBeCalledTimes(1)
-  expect(un1).toBeCalledWith(4)
-  expect(un3).toBeCalledWith(5)
-  expect(un2).toBeCalledWith(6)
-  expect(un4).toBeCalledWith(7)
+  expect(un1).toBeCalledTimes(0)
+  expect(un2).toBeCalledTimes(0)
+  expect(un3).toBeCalledTimes(0)
+  expect(un4).toBeCalledTimes(0)
 });
 
 test('Should work useMemo hook', () => {

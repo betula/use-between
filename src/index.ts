@@ -179,7 +179,6 @@ const factory = (hook: any) => {
   const scopedBoxes = [] as any[]
   let syncs = [] as any[]
   let state = undefined as any
-  let unsubs = [] as any[]
 
   const sync = () => {
     syncs.slice().forEach(fn => fn())
@@ -218,13 +217,10 @@ const factory = (hook: any) => {
       queue.forEach(([box, deps, fn]) => {
         box.deps = deps
         if (box.unsub) {
-          const unsub = box.unsub
-          unsubs = unsubs.filter(fn => fn !== unsub)
-          unsub()
+          box.unsub()
         }
         const unsub = fn()
         if (typeof unsub === "function") {
-          unsubs.push(unsub)
           box.unsub = unsub
         } else {
           box.unsub = null
@@ -253,16 +249,8 @@ const factory = (hook: any) => {
     syncs.push(fn)
   }
 
-  const free = () => {
-    unsubs.slice().forEach(fn => fn())
-    instances.delete(hook)
-  }
-
   const unsub = (fn: any) => {
     syncs = syncs.filter(f => f !== fn)
-    if (syncs.length === 0) {
-      free()
-    }
   }
 
   return {
