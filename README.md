@@ -76,7 +76,7 @@ If you found some bug or want to propose improvement please [make an Issue](http
 
 ### What's new
 
-Version 0.1.0
+Version 0.1.0 - [welcome to discussion](https://github.com/betula/use-between/discussions/19).
 - Now the shared state will not be lost if all components using it are unmounted. ([issue](https://github.com/betula/use-between/issues/17))
 - Minor bug fix.
 
