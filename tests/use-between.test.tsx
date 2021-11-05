@@ -159,34 +159,58 @@ test('Should work useLayoutEffect hook', () => {
   const [ fn1, fn2, fn3, fn4 ] = [ jest.fn(), jest.fn(), jest.fn(), jest.fn() ]
   const [ un1, un2, un3, un4 ] = [ jest.fn(), jest.fn(), jest.fn(), jest.fn() ]
   let i = 0
+  const useDep = () => useState(0);
   const useStore = () => {
-    useLayoutEffect(() => (fn1(i++), () => un1(i++)), [])
-    useEffect(() => (fn2(i++), () => un2(i++)), [])
-    useLayoutEffect(() => (fn3(i++), () => un3(i++)), [])
-    useEffect(() => (fn4(i++), () => un4(i++)), [])
+    const d = useBetween(useDep)[0];
+    useLayoutEffect(() => (fn1(i++,d), () => un1(i++,d)), [d])
+    useEffect(() => (fn2(i++,d), () => un2(i++,d)), [d])
+    useLayoutEffect(() => (fn3(i++,d), () => un3(i++,d)), [d])
+    useEffect(() => (fn4(i++,d), () => un4(i++,d)), [d])
   }
   const A = () => (useBetween(useStore), <a />)
   const B = () => (useBetween(useStore), <b />)
-  const C = () => <><A /><B /></>
+  const M = () => <button onClick={useBetween(useDep)[1].bind(null, v => v+1)} />
+  const C = () => <><A /><B /><M /></>
   const el = mount(<C />)
 
-  expect(fn1).toBeCalledWith(0)
-  expect(fn3).toBeCalledWith(1)
-  expect(fn2).toBeCalledWith(2)
-  expect(fn4).toBeCalledWith(3)
+  expect(fn1).toBeCalledWith(0, 0)
+  expect(fn3).toBeCalledWith(1, 0)
+  expect(fn2).toBeCalledWith(2, 0)
+  expect(fn4).toBeCalledWith(3, 0)
   expect(un1).toBeCalledTimes(0)
   expect(un2).toBeCalledTimes(0)
   expect(un3).toBeCalledTimes(0)
   expect(un4).toBeCalledTimes(0)
+
+  el.find('button').at(0).simulate('click')
+  expect(fn1).toHaveBeenLastCalledWith(5, 1)
+  expect(fn3).toHaveBeenLastCalledWith(7, 1)
+  expect(fn2).toHaveBeenLastCalledWith(9, 1)
+  expect(fn4).toHaveBeenLastCalledWith(11, 1)
+  expect(un1).toBeCalledWith(4, 0)
+  expect(un3).toBeCalledWith(6, 0)
+  expect(un2).toBeCalledWith(8, 0)
+  expect(un4).toBeCalledWith(10, 0)
+
+  el.find('button').at(0).simulate('click')
+  expect(fn1).toHaveBeenLastCalledWith(13, 2)
+  expect(fn3).toHaveBeenLastCalledWith(15, 2)
+  expect(fn2).toHaveBeenLastCalledWith(17, 2)
+  expect(fn4).toHaveBeenLastCalledWith(19, 2)
+  expect(un1).toBeCalledWith(12, 1)
+  expect(un3).toBeCalledWith(14, 1)
+  expect(un2).toBeCalledWith(16, 1)
+  expect(un4).toBeCalledWith(18, 1)
+
+  expect(fn1).toBeCalledTimes(3)
+  expect(fn2).toBeCalledTimes(3)
+  expect(fn3).toBeCalledTimes(3)
+  expect(fn4).toBeCalledTimes(3)
   el.unmount()
-  expect(fn1).toBeCalledTimes(1)
-  expect(fn2).toBeCalledTimes(1)
-  expect(fn3).toBeCalledTimes(1)
-  expect(fn4).toBeCalledTimes(1)
-  expect(un1).toBeCalledTimes(0)
-  expect(un2).toBeCalledTimes(0)
-  expect(un3).toBeCalledTimes(0)
-  expect(un4).toBeCalledTimes(0)
+  expect(un1).toBeCalledTimes(2)
+  expect(un2).toBeCalledTimes(2)
+  expect(un3).toBeCalledTimes(2)
+  expect(un4).toBeCalledTimes(2)
 });
 
 test('Should work useMemo hook', () => {
