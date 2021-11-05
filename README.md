@@ -74,7 +74,7 @@ If you found some bug or want to propose improvement please [make an Issue](http
 + [Try Todos demo on CodeSandbox](https://codesandbox.io/s/todos-use-bettwen-8d2th?file=/src/components/todo-list.jsx)
 + [The article “Reuse React hooks in state sharing” on dev.to](https://dev.to/betula/reuse-react-hooks-in-state-sharing-1ell)
 
-### What's New
+### What's new
 
 Version 0.1.0
 - Now the shared state will not be lost if all components using it are unmounted. ([issue](https://github.com/betula/use-between/issues/17))
