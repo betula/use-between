@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { clear, get, act } from '../src'
+import { clear, get, act, on } from '../src'
 
 // ./shared-counter.js
 const useCounter = () => {
@@ -29,8 +29,24 @@ it('It works', async () => {
   expect(get(useCounter).count).toBe(1)
 
   await act(() => {
-    get(useCounter).dec()
+    get(useCounter).inc()
   })
-  expect(get(useCounter).count).toBe(0)
+  expect(get(useCounter).count).toBe(2)
 })
 
+it('It works with spy', async () => {
+  const spy = jest.fn()
+
+  // Subscribe to a state change
+  on(useCounter, (state) => spy(state.count))
+
+  await act(() => {
+    get(useCounter).inc()
+  })
+  expect(spy).toBeCalledWith(1)
+
+  await act(() => {
+    get(useCounter).dec()
+  })
+  expect(spy).toHaveBeenLastCalledWith(0)
+})
