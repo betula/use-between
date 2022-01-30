@@ -179,6 +179,7 @@ const factory = (hook: any) => {
   const scopedBoxes = [] as any[]
   let syncs = [] as any[]
   let state = undefined as any
+  let unsubs = [] as any[]
 
   const sync = () => {
     syncs.slice().forEach(fn => fn())
@@ -217,10 +218,13 @@ const factory = (hook: any) => {
       queue.forEach(([box, deps, fn]) => {
         box.deps = deps
         if (box.unsub) {
-          box.unsub()
+          const unsub = box.unsub
+          unsubs = unsubs.filter(fn => fn !== unsub)
+          unsub()
         }
         const unsub = fn()
         if (typeof unsub === "function") {
+          unsubs.push(unsub)
           box.unsub = unsub
         } else {
           box.unsub = null
@@ -258,19 +262,25 @@ const factory = (hook: any) => {
     get: () => state,
     sub,
     unsub,
+    unsubs: () => unsubs
   }
 }
 
-type Hook<T> = (initialData?: any) => T;
-
-export const useBetween = <T>(hook: Hook<T>): T => {
-  const forceUpdate = useForceUpdate()
+const getInstance = (hook: any): any => {
   let inst = instances.get(hook)
   if (!inst) {
     inst = factory(hook)
     instances.set(hook, inst)
     inst.init()
   }
+  return inst
+}
+
+type Hook<T> = (initialData?: any) => T
+
+export const useBetween = <T>(hook: Hook<T>): T => {
+  const forceUpdate = useForceUpdate()
+  let inst = getInstance(hook)
   useEffect(() => (inst.sub(forceUpdate), () => inst.unsub(forceUpdate)), [inst])
   return inst.get()
 }
@@ -279,9 +289,36 @@ export const useInitial = <T = any>(data?: T, server?: boolean) => {
   const ref = useRef<number>()
   if (!ref.current) {
     isServer = typeof server === 'undefined' ? detectServer() : server
-    isServer && instances.clear();
+    isServer && clear()
     initialData = data
     ref.current = 1
   }
 }
 
+
+export const get = <T>(hook: Hook<T>): T => getInstance(hook).get()
+
+export const free = function(...hooks: Hook<any>[]): void {
+  if (!hooks.length) {
+    hooks = []
+    instances.forEach((_instance, hook) => hooks.push(hook))
+  }
+
+  let inst
+  hooks.forEach((hook) => (
+    (inst = instances.get(hook)) &&
+      inst.unsubs().slice().forEach((fn: any) => fn())
+  ))
+  hooks.forEach((hook) => instances.delete(hook))
+}
+
+export const clear = () => instances.clear()
+
+export const on = <T>(hook: Hook<T>, fn: (state: T) => void): () => void => {
+  const inst = getInstance(hook)
+  const listener = () => fn(inst.get())
+  inst.sub(listener)
+  return () => inst.unsub(listener)
+}
+
+export const act = <T>(fn: () => T): Promise<T> => Promise.resolve(fn())
