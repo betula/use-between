@@ -32,5 +32,5 @@ it('It works', async () => {
     get(useCounter).dec()
   })
   expect(get(useCounter).count).toBe(0)
-});
+})
 
