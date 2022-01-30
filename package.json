@@ -1,6 +1,6 @@
 {
   "name": "use-between",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "How to share React hooks state between components",
   "repository": {
     "url": "https://github.com/betula/use-between"
