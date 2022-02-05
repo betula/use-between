@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { get, free, clear, on, act } from '../src'
+import { get, free, clear, on, waitForEffects } from '../src'
 
 afterEach(clear)
 
@@ -17,9 +17,8 @@ test('Should work get function', async () => {
   expect(get(useCounter).count).toBe(10)
   expect(counter_spy).toBeCalledTimes(1)
 
-  await act(() => {
-    get(useCounter).setCount(v => v + 5)
-  })
+  get(useCounter).setCount(v => v + 5)
+  await waitForEffects()
 
   expect(get(useCounter).count).toBe(15)
   expect(counter_spy).toBeCalledTimes(2)
@@ -29,7 +28,7 @@ test('Should work get function', async () => {
   expect(counter_spy).toBeCalledTimes(3)
 })
 
-test('Should work free function', async () => {
+test('Should work free function', () => {
   const effect_spy = jest.fn()
   const un_effect_spy = jest.fn()
   const useCounter = () => {
@@ -38,15 +37,15 @@ test('Should work free function', async () => {
     return { count, setCount }
   }
 
-  const { count, setCount} = await act(() => get(useCounter))
+  const { count, setCount} = get(useCounter)
   expect(count).toBe(10)
   expect(effect_spy).toBeCalledWith(10)
 
-  await act(() => setCount(v => v + 7))
+  setCount(v => v + 7)
   expect(effect_spy).toHaveBeenLastCalledWith(17)
   expect(un_effect_spy).toBeCalledWith(10)
 
-  await act(() => setCount(v => v + 9))
+  setCount(v => v + 9)
   expect(get(useCounter).count).toBe(26)
   expect(effect_spy).toHaveBeenLastCalledWith(26)
   expect(un_effect_spy).toHaveBeenLastCalledWith(17)
@@ -55,24 +54,20 @@ test('Should work free function', async () => {
   expect(un_effect_spy).toHaveBeenLastCalledWith(26)
 })
 
-test('Should work few hooks free function', async () => {
+test('Should work few hooks free function', () => {
   const useA = () => useState(0)
   const useB = () => useState(0)
   const useC = () => useState(0)
 
-  await act(() => {
-    get(useA)[1](5)
-    get(useB)[1](6)
-    get(useC)[1](7)
-  });
+  get(useA)[1](5)
+  get(useB)[1](6)
+  get(useC)[1](7)
 
   expect(get(useA)[0]).toBe(5)
   free(useA)
   expect(get(useA)[0]).toBe(0)
 
-  await act(() => {
-    get(useA)[1](15)
-  })
+  get(useA)[1](15)
 
   expect(get(useB)[0]).toBe(6)
   expect(get(useC)[0]).toBe(7)
@@ -86,7 +81,7 @@ test('Should work few hooks free function', async () => {
   expect(get(useA)[0]).toBe(0)
 })
 
-test('Should work on function', async () => {
+test('Should work on function', () => {
   const constr = jest.fn()
   const spy = jest.fn()
   const useA = () => (constr(), useState(0))
@@ -95,9 +90,9 @@ test('Should work on function', async () => {
   expect(constr).toBeCalledTimes(1)
   expect(spy).toBeCalledTimes(0)
 
-  await act(() => get(useA)[1](6))
+  get(useA)[1](6)
   expect(spy).toBeCalledWith(6)
-  await act(() => get(useA)[1](10))
+  get(useA)[1](10)
   expect(spy).toHaveBeenLastCalledWith(10)
   expect(spy).toHaveBeenCalledTimes(2)
 
@@ -105,15 +100,15 @@ test('Should work on function', async () => {
   expect(get(useA)[0]).toBe(0)
   expect(spy).toHaveBeenCalledTimes(2)
 
-  await act(() => get(useA)[1](17))
+  get(useA)[1](17)
   expect(spy).toHaveBeenCalledTimes(2)
 
-  const unsub = on(useA, (state) => spy(state[0]));
-  await act(() => get(useA)[1](18))
+  const unsub = on(useA, (state) => spy(state[0]))
+  get(useA)[1](18)
   expect(spy).toHaveBeenLastCalledWith(18)
   expect(spy).toHaveBeenCalledTimes(3)
 
   unsub()
-  await act(() => get(useA)[1](19))
+  get(useA)[1](19)
   expect(spy).toHaveBeenCalledTimes(3)
 })
