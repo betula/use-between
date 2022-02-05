@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react'
-import { clear, get, waitForEffects, on, useBetween } from '../src'
+import { clear, get, waitForEffects, on, useBetween, mock } from '../src'
 import { act, render } from '@testing-library/react'
 import { mount } from 'enzyme'
 
@@ -80,4 +80,21 @@ it('It works with testing-library render component', async () => {
     get(useCounter).dec()
   })
   expect((await el.findByTestId('count')).textContent).toBe('-1')
+})
+
+it('It works with testing-library render component with mock', async () => {
+  const Counter = () => {
+    const { count } = useBetween(useCounter)
+    return <i data-testid="count">{count}</i>
+  }
+  mock(useCounter, { count: 10 })
+
+  const el = render(<Counter />)
+  expect((await el.findByTestId('count')).textContent).toBe('10')
+
+  // You should use "act" from @testing-library/react
+  act(() => {
+    mock(useCounter, { count: 15 })
+  })
+  expect((await el.findByTestId('count')).textContent).toBe('15')
 })
