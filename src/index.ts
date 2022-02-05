@@ -175,19 +175,24 @@ const ownDisptacher = {
   'useTransition'
 ].forEach(key => (ownDisptacher as any)[key] = notImplemented(key))
 
-const factory = (hook: any) => {
+const factory = (hook: any, options?: any) => {
   const scopedBoxes = [] as any[]
   let syncs = [] as any[]
   let state = undefined as any
   let unsubs = [] as any[]
-  let mocked = false;
+  let mocked = false
+
+  if (options && options.mock) {
+    state = options.mock
+    mocked = true
+  }
 
   const sync = () => {
     syncs.slice().forEach(fn => fn())
   }
 
   const tick = () => {
-    if (mocked) return;
+    if (mocked) return
 
     const originDispatcher = ReactCurrentDispatcher.current
     const originState = [
@@ -255,7 +260,6 @@ const factory = (hook: any) => {
   const sub = (fn: any) => {
     syncs.push(fn)
   }
-
   const unsub = (fn: any) => {
     syncs = syncs.filter(f => f !== fn)
   }
@@ -264,10 +268,10 @@ const factory = (hook: any) => {
     mocked = true
     state = obj
     sync()
-    return () => {
-      mocked = false
-      tick()
-    }
+  }
+  const unmock = () => {
+    mocked = false
+    tick()
   }
 
   return {
@@ -276,7 +280,8 @@ const factory = (hook: any) => {
     sub,
     unsub,
     unsubs: () => unsubs,
-    mock
+    mock,
+    unmock
   }
 }
 
@@ -309,6 +314,15 @@ export const useInitial = <T = any>(data?: T, server?: boolean) => {
   }
 }
 
+export const mock = <T>(hook: Hook<T>, state: any): () => void => {
+  let inst = instances.get(hook)
+  if (inst) inst.mock(state)
+  else {
+    inst = factory(hook, { mock: state })
+    instances.set(hook, inst)
+  }
+  return inst.unmock
+}
 
 export const get = <T>(hook: Hook<T>): T => getInstance(hook).get()
 
@@ -337,4 +351,3 @@ export const on = <T>(hook: Hook<T>, fn: (state: T) => void): () => void => {
 
 export const waitForEffects = () => Promise.resolve()
 
-export const mock = <T>(hook: Hook<T>, state: any): () => void => getInstance(hook).mock(state)

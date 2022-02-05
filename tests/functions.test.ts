@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { get, free, clear, on, waitForEffects, mock, useBetween } from '../src'
 
 afterEach(clear)
@@ -143,4 +143,21 @@ test('Should work mock function', () => {
   expect(get(useB)[0]).toBe(9)
   expect(spy).toHaveBeenLastCalledWith(9)
   expect(spy).toHaveBeenCalledTimes(4)
-});
+})
+
+test('Should work mock function without original function run', () => {
+  const spy = jest.fn().mockReturnValue(1)
+  const useA = () => spy()
+  const unmock = mock(useA, 15)
+
+  expect(get(useA)).toBe(15)
+  expect(spy).toBeCalledTimes(0)
+
+  mock(useA, 17)
+  expect(get(useA)).toBe(17)
+  expect(spy).toBeCalledTimes(0)
+
+  unmock()
+  expect(get(useA)).toBe(1)
+  expect(spy).toBeCalledTimes(1)
+})
