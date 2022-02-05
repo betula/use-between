@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { get, free, clear, on, waitForEffects } from '../src'
+import { useEffect, useMemo, useState } from 'react'
+import { get, free, clear, on, waitForEffects, mock, useBetween } from '../src'
 
 afterEach(clear)
 
@@ -112,3 +112,35 @@ test('Should work on function', () => {
   get(useA)[1](19)
   expect(spy).toHaveBeenCalledTimes(3)
 })
+
+test('Should work mock function', () => {
+  const spy = jest.fn()
+  const useA = () => useState(10)
+  const useB = () => useBetween(useA)
+
+  on(useB, (state) => spy(state[0]))
+  expect(spy).toHaveBeenCalledTimes(0)
+
+  expect(get(useB)[0]).toBe(10)
+  get(useA)[1](5)
+  expect(get(useB)[0]).toBe(5)
+  expect(spy).toHaveBeenLastCalledWith(5)
+  expect(spy).toHaveBeenCalledTimes(1)
+
+  const unmock = mock(useA, [20])
+  expect(get(useB)[0]).toBe(20)
+  expect(spy).toHaveBeenLastCalledWith(20)
+  expect(spy).toHaveBeenCalledTimes(2)
+
+  expect(get(useA)).toStrictEqual([20])
+
+  unmock()
+  expect(get(useB)[0]).toBe(5)
+  expect(spy).toHaveBeenLastCalledWith(5)
+  expect(spy).toHaveBeenCalledTimes(3)
+
+  get(useB)[1](9)
+  expect(get(useB)[0]).toBe(9)
+  expect(spy).toHaveBeenLastCalledWith(9)
+  expect(spy).toHaveBeenCalledTimes(4)
+});

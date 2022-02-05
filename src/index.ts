@@ -180,12 +180,15 @@ const factory = (hook: any) => {
   let syncs = [] as any[]
   let state = undefined as any
   let unsubs = [] as any[]
+  let mocked = false;
 
   const sync = () => {
     syncs.slice().forEach(fn => fn())
   }
 
   const tick = () => {
+    if (mocked) return;
+
     const originDispatcher = ReactCurrentDispatcher.current
     const originState = [
       pointer,
@@ -257,12 +260,23 @@ const factory = (hook: any) => {
     syncs = syncs.filter(f => f !== fn)
   }
 
+  const mock = (obj: any) => {
+    mocked = true
+    state = obj
+    sync()
+    return () => {
+      mocked = false
+      tick()
+    }
+  }
+
   return {
     init: () => tick(),
     get: () => state,
     sub,
     unsub,
-    unsubs: () => unsubs
+    unsubs: () => unsubs,
+    mock
   }
 }
 
@@ -322,3 +336,5 @@ export const on = <T>(hook: Hook<T>, fn: (state: T) => void): () => void => {
 }
 
 export const waitForEffects = () => Promise.resolve()
+
+export const mock = <T>(hook: Hook<T>, state: any): () => void => getInstance(hook).mock(state)
