@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react'
-import { clear, get } from '../src'
+import React, { useState, useEffect } from 'react'
+import { render } from '@testing-library/react'
+import { mount } from 'enzyme'
+import { clear, get, useBetween } from '../src'
 
 
 afterEach(clear)
 
-// Test example
+
 it('Effect should works asynchronous for hooks body', async () => {
   let inc = 0
   const effect_spy = jest.fn()
@@ -32,5 +34,28 @@ it('Effect should works asynchronous for hooks body', async () => {
   expect(effect_spy).toHaveBeenLastCalledWith(4, 7)
   expect(hook_finish_spy).toBeCalledTimes(2)
   expect(hook_finish_spy).toHaveBeenLastCalledWith(3)
+})
+
+it('Effect should update state during hooks creation', async () => {
+  const hook = () => {
+    const [loading, setLoading] = useState(false)
+
+    useEffect(() => {
+      setLoading(true)
+    }, [])
+
+    return loading
+  }
+  const A = () => {
+    const loading = useBetween(hook)
+    return <i data-testid="loading">{loading ? 'loading' : ''}</i>
+  }
+
+  const el = render(<A />)
+  expect((await el.findByTestId('loading')).textContent).toBe('loading')
+
+  clear()
+  const ol = mount(<A />)
+  expect(ol.find('i').text()).toBe('loading')
 })
 

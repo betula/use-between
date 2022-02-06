@@ -6,10 +6,11 @@ import React, {
   useLayoutEffect,
   useMemo,
   useRef,
-  useImperativeHandle
+  useImperativeHandle,
+  useContext
 } from 'react'
 import { mount } from 'enzyme'
-import { useBetween } from '../src'
+import { get, useBetween } from '../src'
 
 test('Should work useState hook', () => {
   const useStore = () => useState(0)
@@ -333,4 +334,27 @@ test('Should work useImperativeHandle hook with callback ref', () => {
   expect(ref).toBeCalledWith(1)
   setV()
   expect(ref).toHaveBeenLastCalledWith(2)
+});
+
+test('Should throw exception for useContext hook', () => {
+  const log = jest.spyOn(console, 'error').mockReturnValue()
+
+  expect(() => {
+    get(() => useContext({} as any))
+  }).toThrow('Hook "useContext" no possible to using inside useBetween scope.')
+
+  expect(log).toHaveBeenCalledWith('Hook "useContext" no possible to using inside useBetween scope.')
+  log.mockReset()
+
+  const A = () => {
+    useBetween(() => useContext({} as any))
+    return null
+  }
+
+  expect(() => {
+    mount(<A />)
+  }).toThrow('Hook "useContext" no possible to using inside useBetween scope.')
+
+  expect(log).toHaveBeenCalledWith('Hook "useContext" no possible to using inside useBetween scope.')
+  log.mockRestore()
 });
