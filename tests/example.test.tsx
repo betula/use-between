@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react'
-import { clear, get, waitForEffects, on, useBetween, mock } from '../src'
+import { clear, get, on, useBetween, mock } from '../src'
 import { act, render } from '@testing-library/react'
 import { mount } from 'enzyme'
 
@@ -25,10 +25,6 @@ it('It works', async () => {
   expect(get(useCounter).count).toBe(0)
 
   get(useCounter).inc()
-
-  // If you are using effects in your shared logic,
-  // you should wait for them to complete.
-  await waitForEffects()
 
   // Check result
   expect(get(useCounter).count).toBe(1)

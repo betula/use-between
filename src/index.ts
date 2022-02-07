@@ -356,5 +356,3 @@ export const on = <T>(hook: Hook<T>, fn: (state: T) => void): () => void => {
   return () => inst.unsub(listener)
 }
 
-export const waitForEffects = () => Promise.resolve()
-

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { get, free, clear, on, waitForEffects, mock, useBetween } from '../src'
+import { get, free, clear, on, mock, useBetween } from '../src'
 
 afterEach(clear)
 
@@ -18,7 +18,6 @@ test('Should work get function', async () => {
   expect(counter_spy).toBeCalledTimes(1)
 
   get(useCounter).setCount(v => v + 5)
-  await waitForEffects()
 
   expect(get(useCounter).count).toBe(15)
   expect(counter_spy).toBeCalledTimes(2)
