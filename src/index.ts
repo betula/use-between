@@ -300,7 +300,14 @@ type Hook<T> = (initialData?: any) => T
 export const useBetween = <T>(hook: Hook<T>): T => {
   const forceUpdate = useForceUpdate()
   let inst = getInstance(hook)
-  useEffect(() => (inst.sub(forceUpdate), () => inst.unsub(forceUpdate)), [inst])
+
+  const instRef = useRef()
+  if (!equals(instRef.current, inst)) {
+    instRef.current = inst
+    inst.sub(forceUpdate)
+  }
+
+  useEffect(() => () => inst.unsub(forceUpdate), [inst])
   return inst.get()
 }
 
