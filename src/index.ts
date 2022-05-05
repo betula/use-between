@@ -258,7 +258,9 @@ const factory = (hook: any, options?: any) => {
   }
 
   const sub = (fn: any) => {
-    syncs.push(fn)
+    if (syncs.indexOf(fn) === -1) {
+      syncs.push(fn)
+    }
   }
   const unsub = (fn: any) => {
     syncs = syncs.filter(f => f !== fn)
@@ -300,13 +302,7 @@ type Hook<T> = (initialData?: any) => T
 export const useBetween = <T>(hook: Hook<T>): T => {
   const forceUpdate = useForceUpdate()
   let inst = getInstance(hook)
-
-  const instRef = useRef()
-  if (!equals(instRef.current, inst)) {
-    instRef.current = inst
-    inst.sub(forceUpdate)
-  }
-
+  inst.sub(forceUpdate)
   useEffect(() => () => inst.unsub(forceUpdate), [inst])
   return inst.get()
 }
