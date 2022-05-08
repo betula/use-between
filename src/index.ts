@@ -303,7 +303,10 @@ export const useBetween = <T>(hook: Hook<T>): T => {
   const forceUpdate = useForceUpdate()
   let inst = getInstance(hook)
   inst.sub(forceUpdate)
-  useEffect(() => () => inst.unsub(forceUpdate), [inst])
+  useEffect(
+    () => (inst.sub(forceUpdate), () => inst.unsub(forceUpdate)),
+    [inst, forceUpdate]
+  )
   return inst.get()
 }
 
