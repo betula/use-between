@@ -68,7 +68,7 @@ If you like this idea and would like to use it, please put star in github. It wi
 + useImperativeHandle
 ```
 
-If you found some bug or want to propose improvement please [make an Issue](https://github.com/betula/use-between/issues/new) or join to [release discussion on Github](https://github.com/betula/use-between/discussions/26). I would be happy for your help to make It better! :wink:
+If you found some bug or want to propose improvement please [make an Issue](https://github.com/betula/use-between/issues/new) or join to [release discussion on Github](https://github.com/betula/use-between/discussions/35). I would be happy for your help to make It better! :wink:
 
 + [How to use SSR](./docs/ssr.md)
 + [Try Todos demo on CodeSandbox](https://codesandbox.io/s/todos-use-bettwen-8d2th?file=/src/components/todo-list.jsx)
