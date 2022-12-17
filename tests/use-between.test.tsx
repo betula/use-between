@@ -32,6 +32,26 @@ test('Should work useState hook', () => {
   expect(el.find('i').text()).toBe('2')
 });
 
+test('Should work function initial state useState hook', () => {
+  const useStore = () => useState(() => 0)
+
+  const A = () => {
+    const [ a ] = useBetween(useStore)
+    return <i>{a}</i>
+  }
+  const B = () => {
+    const [ , set ] = useBetween(useStore)
+    return <button onClick={() => set(x => x + 1)} />
+  }
+
+  const el = mount(<><A /><B /></>)
+  expect(el.find('i').text()).toBe('0')
+  el.find('button').simulate('click')
+  expect(el.find('i').text()).toBe('1')
+  el.find('button').simulate('click')
+  expect(el.find('i').text()).toBe('2')
+});
+
 test('Should work useEffect hook', () => {
   const off = jest.fn()
   const useStore = () => {
