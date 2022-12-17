@@ -10,17 +10,13 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "npx rollup -c",
-    "dev": "npx rollup -cw",
-    "test": "npx jest --coverage --passWithNoTests",
-    "clean": "npx rimraf ./release && npx rimraf ./coverage",
-    "lerna:reset": "npm run lerna:clean && npx lerna clean --yes && npm run lerna:bootstrap",
-    "lerna:update": "npx --y lerna bootstrap --no-ci",
-    "lerna:bootstrap": "npx --y lerna bootstrap --no-ci && npm run lerna:build && npm run lerna:test",
-    "lerna:build": "npx lerna run build",
-    "lerna:test": "npx lerna run test",
-    "lerna:clean": "npx lerna run clean",
-    "lerna:publish": "npm run lerna:clean && npm run lerna:build && npm run lerna:test && npx lerna publish"
+    "build": "rollup -c",
+    "dev": "rollup -cw",
+    "test": "jest --coverage",
+    "clean": "rimraf ./release && rimraf ./coverage",
+    "bootstrap": "npm install && npm run build && npm run test",
+    "reset": "npm run clean && lerna clean --yes && npm run bootstrap",
+    "publish": "npm run clean && npm run build && npm run test && lerna publish"
   },
   "author": "Slava Bereza <mail@betula.co> (http://betula.co)",
   "keywords": [
@@ -64,6 +60,7 @@
     "react-dom": "^16.13.1",
     "rollup": "^2.10.9",
     "rollup-plugin-typescript2": "^0.27.1",
+    "rimraf": "^3.0.2",
     "typescript": "^3.9.3"
   },
   "publishConfig": {
