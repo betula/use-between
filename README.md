@@ -56,6 +56,27 @@ export default App;
 
 If you like this idea and would like to use it, please put star in github. It will be your first contribution!
 
+### Developers :sparkling_heart: use-between
+
+> Hey [@betula](https://github.com/betula), just wanted to say thank you for this awesome library! ✋
+> Switching from React Context + useReducer to this library reduced soooo much boilerplate code.
+> It's much more nice, clean and simple now, plus the bonus of using "useEffect" incapsulated within the state hook is just awesome.
+>
+> I don't get why this library doesn't have more stars and more popularity. People using useContext+useReducer are really missing out 😃
+>
+> [**Jesper**, _This library should have way more stars! 🥇_](https://github.com/betula/use-between/issues/14)
+
+
+> [@betula](https://github.com/betula) as I mentioned before this lib is awesome and it allowed me to simplify an app that was using Redux. I was able to replace everything we were doing with Redux with just use-between and its tiny 2K footprint!
+>
+> Plus personally I think the code is cleaner because with use-between it just looks like normal hooks and not anything special like Redux code. I personally find it easier to read and understand than Redux!
+> 
+> [**Melloware**, _Release discussion_](https://github.com/betula/use-between/discussions/20#discussioncomment-1715792)
+
+> I was about to install Redux until I found this library and it is a live saver. Really awesome job [@betula](https://github.com/betula). I don't know if I ever need to use Redux again haha
+> 
+> [**Ronald Castillo**](https://github.com/betula/use-between/issues/14#issuecomment-1050601343)
+
 ### Supported hooks
 
 ```diff
