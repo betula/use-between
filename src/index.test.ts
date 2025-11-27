@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, renderHook, act } from '@testing-library/react';
-import { between, Context } from './index';
+import { between, Context, Event, shallowEqual } from './index';
 
 // Mock React hooks for testing
 const mockUseState = jest.fn();
@@ -28,24 +28,6 @@ describe('use-between library', () => {
       const callback1 = jest.fn();
       const callback2 = jest.fn();
       
-      // Create a minimal Event class for testing
-      class Event<T = void> {
-        private listeners = new Set<(value: T) => void>();
-        
-        fire(value: T): void {
-          for (const listener of this.listeners) {
-            listener(value);
-          }
-        }
-        
-        subscribe(listener: (value: T) => void): () => void {
-          this.listeners.add(listener);
-          return () => {
-            this.listeners.delete(listener);
-          }
-        }
-      }
-      
       const event = new Event<string>();
       
       event.subscribe(callback1);
@@ -58,23 +40,6 @@ describe('use-between library', () => {
     });
 
     test('should unsubscribe correctly', () => {
-      class Event<T = void> {
-        private listeners = new Set<(value: T) => void>();
-        
-        fire(value: T): void {
-          for (const listener of this.listeners) {
-            listener(value);
-          }
-        }
-        
-        subscribe(listener: (value: T) => void): () => void {
-          this.listeners.add(listener);
-          return () => {
-            this.listeners.delete(listener);
-          }
-        }
-      }
-      
       const callback = jest.fn();
       const event = new Event<string>();
       
@@ -90,27 +55,6 @@ describe('use-between library', () => {
   });
 
   describe('shallowEqual', () => {
-    // Import the function for testing
-    const shallowEqual = (a: any, b: any): boolean => {
-      if (a === b) return true;
-      
-      if (typeof a !== 'object' || a === null || typeof b !== 'object' || b === null) {
-        return false;
-      }
-      
-      const keysA = Object.keys(a);
-      const keysB = Object.keys(b);
-      
-      if (keysA.length !== keysB.length) return false;
-      
-      for (const key of keysA) {
-        if (!Object.prototype.hasOwnProperty.call(b, key) || a[key] !== b[key]) {
-          return false;
-        }
-      }
-      
-      return true;
-    };
 
     test('should return true for identical primitives', () => {
       expect(shallowEqual(1, 1)).toBe(true);

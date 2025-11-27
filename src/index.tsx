@@ -3,7 +3,7 @@ import React, { Fragment, useState, useEffect, useRef, memo, MemoExoticComponent
 /**
  * Minimal class-based Event implementation using Set
  */
-class Event<T = void> {
+export class Event<T = void> {
   private listeners = new Set<(value: T) => void>();
 
   fire(value: T): void {
@@ -58,7 +58,7 @@ interface HookClass extends MemoExoticComponent<() => null> {
 /**
  * Minimal shallow equal implementation
  */
-function shallowEqual(a: any, b: any) {
+export function shallowEqual(a: any, b: any) {
   if (a === b) return true;
   
   if (typeof a !== 'object' || a === null || typeof b !== 'object' || b === null) {
