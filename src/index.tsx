@@ -7,9 +7,7 @@ export class Event<T = void> {
   private listeners = new Set<(value: T) => void>();
 
   fire(value: T): void {
-    for (const listener of this.listeners) {
-      listener(value);
-    }
+    this.listeners.forEach(listener => listener(value));
   }
 
   subscribe(listener: (value: T) => void): () => void {
@@ -74,7 +72,8 @@ export function shallowEqual(a: any, b: any) {
   
   if (keysA.length !== keysB.length) return false;
   
-  for (const key of keysA) {
+  for (let keyIndex = 0; keyIndex < keysA.length; keyIndex += 1) {
+    const key = keysA[keyIndex] as keyof typeof a;
     if (!Object.prototype.hasOwnProperty.call(b, key) || a[key] !== b[key]) {
       return false;
     }
@@ -123,12 +122,12 @@ export function between<T>(hookFn: () => T): () => T {
   onHookClassesUpdated.fire();
 
   function hook(): T {
-    const [value, setValue] = useState<T>(Class[lastStateSymbol] as T);
+    const state = useState<T>(Class[lastStateSymbol] as T);
     useEffect(() => {
-      return Class[onRefreshSymbol]!.subscribe(setValue as () => T);
+      return Class[onRefreshSymbol]!.subscribe(state[1] as () => T);
     }, []);
 
-    return value;
+    return state[0];
   }
 
   _hookFn[cacheSymbol] = hook;
@@ -139,16 +138,16 @@ export function between<T>(hookFn: () => T): () => T {
  * Executor component
  */
 const Executor = memo(() => {
-  const [classes, setClasses] = useState<HookClass[]>(hookClasses);
+  const state = useState<HookClass[]>(hookClasses);
   
   useEffect(() => {
     return onHookClassesUpdated.subscribe(() => {
-      setClasses(hookClasses.slice());
+      state[1](hookClasses.slice());
     });
   }, []);
 
   return <Fragment>
-    {classes.map((Class: HookClass) => <Class key={Class[idSymbol]} />)}
+    {state[0].map((Class: HookClass) => <Class key={Class[idSymbol]} />)}
   </Fragment>;
 });
 
