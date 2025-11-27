@@ -1,5 +1,7 @@
 # use-between-new
 
+[![npm version](https://img.shields.io/npm/v/use-between?style=flat-square)](https://www.npmjs.com/package/use-between-new) [![npm bundle size](https://img.shields.io/bundlephobia/minzip/use-between-new?style=flat-square)](https://bundlephobia.com/result?p=use-between-new)
+
 React hook library for sharing state between components using TypeScript.
 
 ## Installation
