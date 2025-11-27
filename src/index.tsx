@@ -110,9 +110,8 @@ export function between<T>(hookFn: () => T): () => T {
       ref.current = nextState;
       Class[lastStateSymbol] = nextState;
       
-      // Next tick if needed
-      // Promise.resolve().then(Class[onRefreshSymbol]!.fire);
-      Class[onRefreshSymbol]!.fire(nextState);
+      // Next tick for prevent calling setState of another component in the own render phase
+      Promise.resolve().then(() => Class[onRefreshSymbol]!.fire(nextState));
     }
 
     return null;

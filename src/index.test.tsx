@@ -1,27 +1,16 @@
 import React from 'react';
-import { render, renderHook, act, fireEvent } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { between, Context, Event, shallowEqual } from './index';
 
-// Mock React hooks for testing
-// const mockUseState = jest.fn();
-// const mockUseEffect = jest.fn();
-// const mockUseRef = jest.fn();
-
-jest.mock('react', () => ({
-  ...jest.requireActual('react'),
-  // useState: (...args: any[]) => mockUseState(...args),
-  // useEffect: (...args: any[]) => mockUseEffect(...args),
-  // useRef: (...args: any[]) => mockUseRef(...args),
-}));
+// jest.mock('react', () => ({
+//   ...jest.requireActual('react'),
+// }));
 
 describe('use-between library', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    // Reset mock implementations
-    // mockUseState.mockImplementation(jest.requireActual('react').useState);
-    // mockUseEffect.mockImplementation(jest.requireActual('react').useEffect);
-    // mockUseRef.mockImplementation(jest.requireActual('react').useRef);
   });
 
   describe('Event class', () => {
@@ -164,7 +153,7 @@ describe('use-between library', () => {
   });
 
   describe('Integration tests', () => {
-    test('should maintain state between different hook usages', () => {      
+    test('should maintain state between different hook usages', async () => {
       const useCounter = between(() => {
         const [count, setCount] = React.useState(0);
         return {
@@ -189,7 +178,7 @@ describe('use-between library', () => {
 
       // Component 2
       const Component2 = () => {
-        const counter = useCounter()
+        const counter = useCounter();
         return (
           <div>
             <span data-testid="count-2">{counter.count}</span>
@@ -207,31 +196,30 @@ describe('use-between library', () => {
         </Context>
       );
 
-      const { getByTestId } = render(
-        React.createElement(Context, { 
-          children: [
-            React.createElement(App, {}),
-          ]
-        })
-      );
+      const user = userEvent.setup();
+      const { getByTestId } = render(<App />);
       
+      // Both components should show the same initial value
       expect(getByTestId('count-1')).toHaveTextContent('0');
       expect(getByTestId('count-2')).toHaveTextContent('0');
 
+      // Click increment in component 1
+      await user.click(getByTestId('increment-1'));
 
-      act(() => {
-        fireEvent.click(getByTestId('increment-1'));
+      // Both components should update to show 1
+      await waitFor(() => {
+        expect(getByTestId('count-1')).toHaveTextContent('1');
+        expect(getByTestId('count-2')).toHaveTextContent('1');
       });
 
-      expect(getByTestId('count-1')).toHaveTextContent('1');
-      expect(getByTestId('count-2')).toHaveTextContent('0');
+      // Click decrement in component 2
+      await user.click(getByTestId('decrement-2'));
 
-      act(() => {
-        fireEvent.click(getByTestId('decrement-2'));
+      // Both components should update to show 0
+      await waitFor(() => {
+        expect(getByTestId('count-1')).toHaveTextContent('0');
+        expect(getByTestId('count-2')).toHaveTextContent('0');
       });
-
-      expect(getByTestId('count-1')).toHaveTextContent('1');
-      expect(getByTestId('count-2')).toHaveTextContent('-1');
     });
 
     test('should handle hook function return values', () => {
