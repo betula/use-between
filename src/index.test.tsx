@@ -4,10 +4,6 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { between, Context, Event, shallowEqual } from './index';
 
-// jest.mock('react', () => ({
-//   ...jest.requireActual('react'),
-// }));
-
 describe('use-between library', () => {
   beforeEach(() => {
     jest.clearAllMocks();
