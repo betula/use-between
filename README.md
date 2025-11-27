@@ -19,7 +19,7 @@ import React from 'react';
 import { between, Context } from 'use-between-new';
 
 // Create a shared hook
-const useCounter = between(() => {
+const useSharedCounter = between(() => {
   const [count, setCount] = React.useState(0);
   
   return {
@@ -31,7 +31,7 @@ const useCounter = between(() => {
 
 // Component A
 function ComponentA() {
-  const { count, increment } = useCounter();
+  const { count, increment } = useSharedCounter();
   
   return (
     <div>
@@ -44,7 +44,7 @@ function ComponentA() {
 
 // Component B
 function ComponentB() {
-  const { count, decrement } = useCounter();
+  const { count, decrement } = useSharedCounter();
   
   return (
     <div>
