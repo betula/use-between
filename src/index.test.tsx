@@ -1,26 +1,27 @@
 import React from 'react';
-import { render, renderHook, act } from '@testing-library/react';
+import { render, renderHook, act, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { between, Context, Event, shallowEqual } from './index';
 
 // Mock React hooks for testing
-const mockUseState = jest.fn();
-const mockUseEffect = jest.fn();
-const mockUseRef = jest.fn();
+// const mockUseState = jest.fn();
+// const mockUseEffect = jest.fn();
+// const mockUseRef = jest.fn();
 
 jest.mock('react', () => ({
   ...jest.requireActual('react'),
-  useState: (...args: any[]) => mockUseState(...args),
-  useEffect: (...args: any[]) => mockUseEffect(...args),
-  useRef: (...args: any[]) => mockUseRef(...args),
+  // useState: (...args: any[]) => mockUseState(...args),
+  // useEffect: (...args: any[]) => mockUseEffect(...args),
+  // useRef: (...args: any[]) => mockUseRef(...args),
 }));
 
 describe('use-between library', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     // Reset mock implementations
-    mockUseState.mockImplementation(jest.requireActual('react').useState);
-    mockUseEffect.mockImplementation(jest.requireActual('react').useEffect);
-    mockUseRef.mockImplementation(jest.requireActual('react').useRef);
+    // mockUseState.mockImplementation(jest.requireActual('react').useState);
+    // mockUseEffect.mockImplementation(jest.requireActual('react').useEffect);
+    // mockUseRef.mockImplementation(jest.requireActual('react').useRef);
   });
 
   describe('Event class', () => {
@@ -51,6 +52,22 @@ describe('use-between library', () => {
       
       expect(callback).toHaveBeenCalledTimes(1);
       expect(callback).toHaveBeenCalledWith('test1');
+    });
+
+    test('should clear all listeners', () => {
+      const callback1 = jest.fn();
+      const callback2 = jest.fn();
+      
+      const event = new Event<string>();
+      
+      event.subscribe(callback1);
+      event.subscribe(callback2);
+      
+      event.clear();
+      event.fire('test');
+      
+      expect(callback1).not.toHaveBeenCalled();
+      expect(callback2).not.toHaveBeenCalled();
     });
   });
 
@@ -147,27 +164,74 @@ describe('use-between library', () => {
   });
 
   describe('Integration tests', () => {
-    test('should maintain state between different hook usages', () => {
-      let externalState = { count: 0 };
-      
+    test('should maintain state between different hook usages', () => {      
       const useCounter = between(() => {
-        const [count, setCount] = mockUseState(externalState.count);
-        
+        const [count, setCount] = React.useState(0);
         return {
           count,
-          increment: () => {
-            externalState.count += 1;
-            setCount(externalState.count);
-          }
+          increment: () => setCount(count + 1),
+          decrement: () => setCount(count - 1),
         };
       });
 
-      // Test that the same hook is returned for the same function reference
-      const testFn = () => externalState;
-      const hook1 = between(testFn);
-      const hook2 = between(testFn);
+      // Component 1
+      const Component1 = () => {
+        const counter = useCounter();
+        return (
+          <div>
+            <span data-testid="count-1">{counter.count}</span>
+            <button data-testid="increment-1" onClick={counter.increment}>
+              Increment
+            </button>
+          </div>
+        );
+      };
+
+      // Component 2
+      const Component2 = () => {
+        const counter = useCounter()
+        return (
+          <div>
+            <span data-testid="count-2">{counter.count}</span>
+            <button data-testid="decrement-2" onClick={counter.decrement}>
+              Decrement
+            </button>
+          </div>
+        );
+      };
+
+      const App = () => (
+        <Context>
+          <Component1 />
+          <Component2 />
+        </Context>
+      );
+
+      const { getByTestId } = render(
+        React.createElement(Context, { 
+          children: [
+            React.createElement(App, {}),
+          ]
+        })
+      );
       
-      expect(hook1).toBe(hook2);
+      expect(getByTestId('count-1')).toHaveTextContent('0');
+      expect(getByTestId('count-2')).toHaveTextContent('0');
+
+
+      act(() => {
+        fireEvent.click(getByTestId('increment-1'));
+      });
+
+      expect(getByTestId('count-1')).toHaveTextContent('1');
+      expect(getByTestId('count-2')).toHaveTextContent('0');
+
+      act(() => {
+        fireEvent.click(getByTestId('decrement-2'));
+      });
+
+      expect(getByTestId('count-1')).toHaveTextContent('1');
+      expect(getByTestId('count-2')).toHaveTextContent('-1');
     });
 
     test('should handle hook function return values', () => {

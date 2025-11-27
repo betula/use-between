@@ -18,6 +18,10 @@ export class Event<T = void> {
       this.listeners.delete(listener);
     }
   }
+
+  clear(): void {
+    this.listeners.clear();
+  }
 }
 
 /**
@@ -89,8 +93,8 @@ function getNextHookClassId(): number {
 /**
  * between hook factory
  */
-export function between(hookFn: () => void): () => void {
-  const _hookFn = hookFn as (typeof hookFn & { [cacheSymbol]?: () => void });
+export function between<T>(hookFn: () => T): () => T {
+  const _hookFn = hookFn as (typeof hookFn & { [cacheSymbol]?: () => T });
 
   // Return the cached hook if it exists
   if (_hookFn[cacheSymbol]) {
@@ -104,6 +108,7 @@ export function between(hookFn: () => void): () => void {
 
     if (!shallowEqual(ref.current, nextState)) {
       ref.current = nextState;
+      Class[lastStateSymbol] = nextState;
       
       // Next tick if needed
       // Promise.resolve().then(Class[onRefreshSymbol]!.fire);
@@ -118,10 +123,10 @@ export function between(hookFn: () => void): () => void {
   hookClasses.push(Class);
   onHookClassesUpdated.fire();
 
-  function hook() {
-    const [value, setValue] = useState<unknown>(Class[lastStateSymbol]);
+  function hook(): T {
+    const [value, setValue] = useState<T>(Class[lastStateSymbol] as T);
     useEffect(() => {
-      return Class[onRefreshSymbol]!.subscribe(setValue)
+      return Class[onRefreshSymbol]!.subscribe(setValue as () => T);
     }, []);
 
     return value;
