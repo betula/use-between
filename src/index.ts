@@ -311,7 +311,7 @@ export const useBetween = <T>(hook: Hook<T>): T => {
 }
 
 export const useInitial = <T = any>(data?: T, server?: boolean) => {
-  const ref = useRef<number>()
+  const ref = useRef<number>(0)
   if (!ref.current) {
     isServer = typeof server === 'undefined' ? detectServer() : server
     isServer && clear()
