@@ -11,7 +11,7 @@ Imagine you have a large office with many rooms (React components), and in each 
 
 ## How does it work?
 
-The code creates something like a **"magic radio"** for your React application. Each shared hook acts like a radio station, broadcasting its updates to all connected components.
+The code creates something like a **"magic radio"** for your React application. Each shared hook acts like a radio station. It can broadcast changes, and anyone can tune into its frequency.
 
 1. **The `between()` function** — this is the main magic! You give it a regular React hook, and it transforms it into a "shared hook" that different components can connect to simultaneously. They will all see **the same data** in real-time.
 
