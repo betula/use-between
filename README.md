@@ -11,7 +11,7 @@ Imagine you have a large office with many rooms (React components), and in each 
 
 ## How does it work?
 
-The code creates something like a **"magic radio"** for your React application:
+The code creates something like a **"magic radio"** for your React application. Each shared hook acts like a radio station, broadcasting its updates to all connected components.
 
 1. **The `between()` function** — this is the main magic! You give it a regular React hook, and it transforms it into a "shared hook" that different components can connect to simultaneously. They will all see **the same data** in real-time.
 
@@ -29,10 +29,8 @@ Here's how you could implement this with `between()`:
 import { useState } from "react";
 import { between, Context } from "use-between-new";
 
-// Create a shared theme hook
+// Using regular React hooks
 const useSharedTheme = between(() => {
-
-  // Using regular React hooks
   const [theme, setTheme] = useState('light');
 
   return { 
@@ -56,7 +54,7 @@ function Header() {
 
 function Sidebar() {
   const { theme } = useSharedTheme();
-  
+
   return <aside className={theme}>Sidebar content</aside>;
 }
 
