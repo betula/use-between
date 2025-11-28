@@ -1,16 +1,9 @@
 # use-between-new
 
-[![npm version](https://img.shields.io/npm/v/use-between-new?style=flat-square)](https://www.npmjs.com/package/use-between-new) [![npm bundle size](https://img.shields.io/bundlephobia/minzip/use-between-new?style=flat-square)](https://bundlephobia.com/result?p=use-between-new)
+An **easy-to-use** React hook library for sharing state between components
 
-React hook library for sharing state between components using TypeScript.
+[![npm version](https://img.shields.io/npm/v/use-between-new?style=flat-square)](https://www.npmjs.com/package/use-between-new) [![npm bundle size](https://img.shields.io/bundlephobia/minzip/use-between-new?style=flat-square)](https://bundlephobia.com/result?p=use-between-new) [![typescript supported](https://img.shields.io/npm/types/typescript?style=flat-square)](https://github.com/betula/use-between)
 
-## Installation
-
-```bash
-npm install use-between-new
-```
-
-## Usage
 
 Imagine you have a large office with many rooms (React components), and in each room people work with their own data. Normally in React, each "room" lives its own life, and if you need to pass information from one room to another, you have to run "wires" through all the walls (prop drilling) or use complex systems like Redux.
 
@@ -67,12 +60,6 @@ function Sidebar() {
   return <aside className={theme}>Sidebar content</aside>;
 }
 
-function Footer() {
-  const { theme } = useSharedTheme();
-  
-  return <footer className={theme}>Footer content</footer>;
-}
-
 // Wrap your app with Context
 function App() {
   return (
@@ -91,6 +78,16 @@ When you click the button in Header, both Sidebar and Footer instantly update to
 
 The code uses memoization and optimizations so components only re-render when the data actually changes.
 
+## Supported hooks
+
+**All hooks** including `useContext` and `react-router-dom`.
+
+## Installation
+
+```bash
+npm install use-between-new
+```
+
 ## Features
 
 - ✅ TypeScript support
@@ -99,47 +96,7 @@ The code uses memoization and optimizations so components only re-render when th
 - ✅ Automatic state synchronization
 - ✅ Memory efficient
 
-## Performance Optimizations 🚀
 
-- **`memo()`** wraps components to prevent unnecessary re-renders
-- **`Set` data structure** in Event class ensures O(1) add/remove operations for subscribers
-- **Shallow equality checks** avoid deep comparisons that could slow things down
-- **Single Executor** manages all hooks centrally, avoiding scattered update logic
+Enjoy your code!
 
-The beauty is that this all happens automatically — you just wrap your hook and forget about the complexity!
-
-## API
-
-#### `between(hookFn: () => T): () => T`
-
-Creates a shared hook from a regular hook function. The returned hook will maintain the same state across all components that use it.
-
-#### `Context`
-
-A context component that should wrap your app to enable the use-between functionality. Place this at the root of your React component tree.
-
-## Development
-
-```bash
-# Install dependencies
-npm install
-
-# Run tests
-npm test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Run tests in coverage mode
-npm run test:coverage
-
-# Build the library
-npm run build
-
-# Development mode (watch)
-npm run dev
-```
-
-## License
-
-MIT
+And good luck! 🍀
