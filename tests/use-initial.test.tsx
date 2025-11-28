@@ -4,7 +4,7 @@ import React, {
   useLayoutEffect,
   useImperativeHandle
 } from 'react'
-import { mount } from 'enzyme'
+import { render, fireEvent } from '@testing-library/react'
 import { useBetween, useInitial } from '../src'
 
 test('Should work initial data', () => {
@@ -25,7 +25,7 @@ test('Should work initial data', () => {
     return <><A /><B /></>
   }
 
-  mount(<C/>)
+  render(<C/>)
   expect(spy).toHaveBeenNthCalledWith(1, 10)
   expect(spy).toHaveBeenNthCalledWith(2, 10)
   expect(spy).toHaveBeenCalledTimes(2)
@@ -55,9 +55,10 @@ test('Should set initial data once', () => {
     )
   }
 
-  const el = mount(<A/>)
-  const up1 = () => el.find('button').at(0).simulate('click')
-  const up2 = () => el.find('button').at(1).simulate('click')
+  const el = render(<A/>)
+  const buttons = el.getAllByRole('button')
+  const up1 = () => fireEvent.click(buttons[0])
+  const up2 = () => fireEvent.click(buttons[1])
 
   expect(spy1).toHaveBeenLastCalledWith(0)
   expect(spy2).toHaveBeenLastCalledWith(0)
@@ -96,7 +97,7 @@ test('Should block effect hooks on server', () => {
     return <><A /><B /></>
   }
 
-  mount(<C/>)
+  render(<C/>)
   expect(fn).toBeCalledTimes(1)
   expect(fnA).toBeCalledTimes(0)
   expect(fnB).toBeCalledTimes(0)
@@ -115,18 +116,21 @@ test('Should reset instances each server run', () => {
   }
   const A = () => {
     useInitial(inital, server)
-    return <i>{useBetween(useStore)}</i>
+    return <i data-testid="result">{useBetween(useStore)}</i>
   }
 
-  el = mount(<A/>)
-  expect(el.find('i').text()).toBe('0')
+  el = render(<A/>)
+  expect(el.getByTestId('result').textContent).toBe('0')
+  el.unmount()
   inital = 1
-  el = mount(<A/>)
-  expect(el.find('i').text()).toBe('0')
+  el = render(<A/>)
+  expect(el.getByTestId('result').textContent).toBe('0')
+  el.unmount()
   server = true
-  el = mount(<A/>)
-  expect(el.find('i').text()).toBe('1')
+  el = render(<A/>)
+  expect(el.getByTestId('result').textContent).toBe('1')
+  el.unmount()
   inital = 2
-  el = mount(<A/>)
-  expect(el.find('i').text()).toBe('2')
+  el = render(<A/>)
+  expect(el.getByTestId('result').textContent).toBe('2')
 });

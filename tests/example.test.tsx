@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from 'react'
 import { clear, get, on, useBetween, mock } from '../src'
 import { act, render } from '@testing-library/react'
-import { mount } from 'enzyme'
 
 // ./shared-counter.js
 const useCounter = () => {
@@ -46,20 +45,20 @@ it('It works with spy', () => {
   expect(spy).toHaveBeenLastCalledWith(0)
 })
 
-it('It works with enzyme render component', async () => {
+it('It works with testing-library render component', async () => {
   const Counter = () => {
     const { count } = useBetween(useCounter)
-    return <i>{count}</i>
+    return <i data-testid="count-alternative">{count}</i>
   }
 
-  const el = mount(<Counter />)
-  expect(el.find('i').text()).toBe('0')
+  const el = render(<Counter />)
+  expect((await el.findByTestId('count-alternative')).textContent).toBe('0')
 
   // You should use "act" from @testing-library/react
   act(() => {
     get(useCounter).inc()
   })
-  expect(el.find('i').text()).toBe('1')
+  expect((await el.findByTestId('count-alternative')).textContent).toBe('1')
 })
 
 it('It works with testing-library render component', async () => {

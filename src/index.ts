@@ -194,7 +194,7 @@ const factory = (hook: any, options?: any) => {
   const tick = () => {
     if (mocked) return
 
-    const originDispatcher = ReactCurrentDispatcher.current
+    const originDispatcher = (ReactCurrentDispatcher as any).current
     const originState = [
       pointer,
       useEffectQueue,
@@ -219,7 +219,7 @@ const factory = (hook: any, options?: any) => {
       }
     }
 
-    ReactCurrentDispatcher.current = ownDisptacher as any
+    ;(ReactCurrentDispatcher as any).current = ownDisptacher as any
     state = hook(initialData)
 
     ;[ useLayoutEffectQueue, useEffectQueue ].forEach(queue => (
@@ -247,7 +247,7 @@ const factory = (hook: any, options?: any) => {
       boxes,
       nextTick
     ] = originState
-    ReactCurrentDispatcher.current = originDispatcher
+    ;(ReactCurrentDispatcher as any).current = originDispatcher
 
     tickBody = false
     if (!tickAgain) {

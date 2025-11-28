@@ -18,7 +18,8 @@ type ReactSharedInternalsType = {
 export const ReactSharedInternals: ReactSharedInternalsType =
   (React as any).__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED ??
   (React as any).__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE ??
-  (React as any).__SERVER_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE;
+  (React as any).__SERVER_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE ??
+  (React as any)._DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE;
 
 function resolveDispatcher() {
   if("ReactCurrentDispatcher" in ReactSharedInternals) {

@@ -9,27 +9,27 @@ import React, {
   useImperativeHandle,
   useContext
 } from 'react'
-import { mount } from 'enzyme'
-import { get, useBetween } from '../src'
+import { render, fireEvent } from '@testing-library/react'
+import { get, useBetween, free } from '../src'
 
 test('Should work useState hook', () => {
   const useStore = () => useState(0)
 
   const A = () => {
     const [ a ] = useBetween(useStore)
-    return <i>{a}</i>
+    return <i data-testid="counter">{a}</i>
   }
   const B = () => {
     const [ , set ] = useBetween(useStore)
-    return <button onClick={() => set(x => x + 1)} />
+    return <button data-testid="increment" onClick={() => set(x => x + 1)} />
   }
 
-  const el = mount(<><A /><B /></>)
-  expect(el.find('i').text()).toBe('0')
-  el.find('button').simulate('click')
-  expect(el.find('i').text()).toBe('1')
-  el.find('button').simulate('click')
-  expect(el.find('i').text()).toBe('2')
+  const el = render(<><A /><B /></>)
+  expect(el.getByTestId('counter').textContent).toBe('0')
+  fireEvent.click(el.getByTestId('increment'))
+  expect(el.getByTestId('counter').textContent).toBe('1')
+  fireEvent.click(el.getByTestId('increment'))
+  expect(el.getByTestId('counter').textContent).toBe('2')
 });
 
 test('Should work function initial state useState hook', () => {
@@ -37,19 +37,19 @@ test('Should work function initial state useState hook', () => {
 
   const A = () => {
     const [ a ] = useBetween(useStore)
-    return <i>{a}</i>
+    return <i data-testid="counter">{a}</i>
   }
   const B = () => {
     const [ , set ] = useBetween(useStore)
-    return <button onClick={() => set(x => x + 1)} />
+    return <button data-testid="increment" onClick={() => set(x => x + 1)} />
   }
 
-  const el = mount(<><A /><B /></>)
-  expect(el.find('i').text()).toBe('0')
-  el.find('button').simulate('click')
-  expect(el.find('i').text()).toBe('1')
-  el.find('button').simulate('click')
-  expect(el.find('i').text()).toBe('2')
+  const el = render(<><A /><B /></>)
+  expect(el.getByTestId('counter').textContent).toBe('0')
+  fireEvent.click(el.getByTestId('increment'))
+  expect(el.getByTestId('counter').textContent).toBe('1')
+  fireEvent.click(el.getByTestId('increment'))
+  expect(el.getByTestId('counter').textContent).toBe('2')
 });
 
 test('Should work useEffect hook', () => {
@@ -68,34 +68,40 @@ test('Should work useEffect hook', () => {
   }
   const A = () => {
     const { a, setA } = useBetween(useStore)
-    return <><i>{a}</i><button onClick={() => setA(10)} /></>
+    return <div data-testid="component-a">
+      <i data-testid="value-a">{a}</i>
+      <button data-testid="button-a" onClick={() => setA(10)} />
+    </div>
   }
   const B = () => {
     const { b, setB } = useBetween(useStore)
-    return <><i>{b}</i><button onClick={() => setB(10)} /></>
+    return <div data-testid="component-b">
+      <i data-testid="value-b">{b}</i>
+      <button data-testid="button-b" onClick={() => setB(10)} />
+    </div>
   }
   const C = () => <><A /><B /></>
-  const el = mount(<C />)
-  const a = () => el.find(A).find('i').text()
-  const b = () => el.find(B).find('i').text()
-  const setA = () => el.find(A).find('button').simulate('click')
-  const setB = () => el.find(B).find('button').simulate('click')
+  const el = render(<C />)
+  
+  const getA = () => el.getByTestId('value-a').textContent
+  const getB = () => el.getByTestId('value-b').textContent
 
-  expect(a()).toBe('0')
-  expect(b()).toBe('0')
-  setA()
-  expect(a()).toBe('10')
-  expect(b()).toBe('5')
-  setB()
-  expect(a()).toBe('20')
-  expect(b()).toBe('10')
-  setA()
-  expect(a()).toBe('10')
-  expect(b()).toBe('5')
+  expect(getA()).toBe('0')
+  expect(getB()).toBe('0')
+  fireEvent.click(el.getByTestId('button-a'))
+  expect(getA()).toBe('10')
+  expect(getB()).toBe('5')
+  fireEvent.click(el.getByTestId('button-b'))
+  expect(getA()).toBe('20')
+  expect(getB()).toBe('10')
+  fireEvent.click(el.getByTestId('button-a'))
+  expect(getA()).toBe('10')
+  expect(getB()).toBe('5')
 
   expect(off).toBeCalledTimes(0)
   el.unmount()
-  expect(off).toBeCalledTimes(0)
+  free(useStore)
+  expect(off).toBeCalledTimes(1)
 });
 
 test('Should work useReducer hook', () => {
@@ -113,36 +119,34 @@ test('Should work useReducer hook', () => {
 
   const useStore = () => useReducer(reducer, initialState)
 
-  const A = () => <i>{useBetween(useStore)[0].count}</i>
+  const A = () => <i data-testid="count">{useBetween(useStore)[0].count}</i>
   const B = () => {
     const [ , dispatch ] = useBetween(useStore)
     return (
       <>
-        <button onClick={() => dispatch({type: 'decrement'})} />
-        <button onClick={() => dispatch({type: 'increment'})} />
+        <button data-testid="decrement" onClick={() => dispatch({type: 'decrement'})} />
+        <button data-testid="increment" onClick={() => dispatch({type: 'increment'})} />
       </>
     )
   }
 
-  const el = mount(<><A /><B /></>)
-  const text = () => el.find('i').text()
-  const dec = () => el.find('button').at(0).simulate('click')
-  const inc = () => el.find('button').at(1).simulate('click')
+  const el = render(<><A /><B /></>)
+  const getText = () => el.getByTestId('count').textContent
 
-  expect(text()).toBe('0')
-  dec()
-  expect(text()).toBe('-1')
-  dec()
-  expect(text()).toBe('-2')
-  inc()
-  inc()
-  inc()
-  expect(text()).toBe('1')
+  expect(getText()).toBe('0')
+  fireEvent.click(el.getByTestId('decrement'))
+  expect(getText()).toBe('-1')
+  fireEvent.click(el.getByTestId('decrement'))
+  expect(getText()).toBe('-2')
+  fireEvent.click(el.getByTestId('increment'))
+  fireEvent.click(el.getByTestId('increment'))
+  fireEvent.click(el.getByTestId('increment'))
+  expect(getText()).toBe('1')
 });
 
 test('Should work useCallback hook', () => {
   let lastFn: any
-  const fns = []
+  const fns: (() => void)[] = []
   const useStore = () => {
     const [ a, setA ] = useState(0)
     const [ , setB ] = useState(0)
@@ -156,22 +160,20 @@ test('Should work useCallback hook', () => {
   const A = () => {
     const [ , setA, setB ] = useBetween(useStore)
     return <>
-      <button onClick={() => setA(x => x + 1)} />
-      <button onClick={() => setB(x => x + 1)} />
+      <button data-testid="set-a" onClick={() => setA(x => x + 1)} />
+      <button data-testid="set-b" onClick={() => setB(x => x + 1)} />
     </>
   }
 
-  const el = mount(<A />)
-  const setA = () => el.find('button').at(0).simulate('click')
-  const setB = () => el.find('button').at(1).simulate('click')
+  const el = render(<A />)
 
   expect(fns.length).toBe(1)
   expect(fns[0] === lastFn).toBeTruthy()
-  setB()
+  fireEvent.click(el.getByTestId('set-b'))
   expect(fns.length).toBe(2)
   expect(fns[0] === lastFn).toBeTruthy()
   expect(fns[1] === lastFn).toBeFalsy()
-  setA()
+  fireEvent.click(el.getByTestId('set-a'))
   expect(fns.length).toBe(3)
   expect(fns[2] === lastFn).toBeTruthy()
 });
@@ -190,9 +192,9 @@ test('Should work useLayoutEffect hook', () => {
   }
   const A = () => (useBetween(useStore), <a />)
   const B = () => (useBetween(useStore), <b />)
-  const M = () => <button onClick={useBetween(useDep)[1].bind(null, v => v+1)} />
+  const M = () => <button data-testid="increment" onClick={useBetween(useDep)[1].bind(null, v => v+1)} />
   const C = () => <><A /><B /><M /></>
-  const el = mount(<C />)
+  const el = render(<C />)
 
   expect(fn1).toBeCalledWith(0, 0)
   expect(fn3).toBeCalledWith(1, 0)
@@ -203,7 +205,7 @@ test('Should work useLayoutEffect hook', () => {
   expect(un3).toBeCalledTimes(0)
   expect(un4).toBeCalledTimes(0)
 
-  el.find('button').at(0).simulate('click')
+  fireEvent.click(el.getByTestId('increment'))
   expect(fn1).toHaveBeenLastCalledWith(5, 1)
   expect(fn3).toHaveBeenLastCalledWith(7, 1)
   expect(fn2).toHaveBeenLastCalledWith(9, 1)
@@ -213,7 +215,7 @@ test('Should work useLayoutEffect hook', () => {
   expect(un2).toBeCalledWith(8, 0)
   expect(un4).toBeCalledWith(10, 0)
 
-  el.find('button').at(0).simulate('click')
+  fireEvent.click(el.getByTestId('increment'))
   expect(fn1).toHaveBeenLastCalledWith(13, 2)
   expect(fn3).toHaveBeenLastCalledWith(15, 2)
   expect(fn2).toHaveBeenLastCalledWith(17, 2)
@@ -228,10 +230,11 @@ test('Should work useLayoutEffect hook', () => {
   expect(fn3).toBeCalledTimes(3)
   expect(fn4).toBeCalledTimes(3)
   el.unmount()
-  expect(un1).toBeCalledTimes(2)
-  expect(un2).toBeCalledTimes(2)
-  expect(un3).toBeCalledTimes(2)
-  expect(un4).toBeCalledTimes(2)
+  free(useStore, useDep)
+  expect(un1).toBeCalledTimes(3)
+  expect(un2).toBeCalledTimes(3)
+  expect(un3).toBeCalledTimes(3)
+  expect(un4).toBeCalledTimes(3)
 });
 
 test('Should work useMemo hook', () => {
@@ -248,28 +251,27 @@ test('Should work useMemo hook', () => {
   const A = () => {
     const { b, setA } = useBetween(useStore)
     return <>
-      <b>{b}</b>
-      <button onClick={() => setA(x => x + 1)} />
+      <b data-testid="value-b">{b}</b>
+      <button data-testid="set-a" onClick={() => setA(x => x + 1)} />
     </>
   }
 
-  const el = mount(<A />)
-  const setA = () => el.find('button').simulate('click')
-  const b = () => +el.find('b').text()
+  const el = render(<A />)
+  const getB = () => +el.getByTestId('value-b').textContent
 
   expect(fa).toBeCalledWith(0)
   expect(fb).toBeCalledTimes(1)
-  expect(b()).toBe(1)
-  setA()
+  expect(getB()).toBe(1)
+  fireEvent.click(el.getByTestId('set-a'))
   expect(fa).toBeCalledTimes(2)
   expect(fa).toHaveBeenLastCalledWith(1)
-  expect(b()).toBe(2)
+  expect(getB()).toBe(2)
   expect(fb).toBeCalledTimes(1)
-  setA()
-  setA()
+  fireEvent.click(el.getByTestId('set-a'))
+  fireEvent.click(el.getByTestId('set-a'))
   expect(fa).toBeCalledTimes(4)
   expect(fa).toHaveBeenLastCalledWith(3)
-  expect(b()).toBe(4)
+  expect(getB()).toBe(4)
   expect(fb).toBeCalledTimes(1)
 });
 
@@ -282,13 +284,12 @@ test('Should work useRef hook', () => {
   }
   const A = () => {
     const { set } = useBetween(useStore)
-    return <button onClick={() => set(v => v + 1)} />
+    return <button data-testid="increment" onClick={() => set(v => v + 1)} />
   }
-  const el = mount(<A />)
-  const inc = () => el.find('button').simulate('click')
+  const el = render(<A />)
 
   expect(fn).toHaveBeenLastCalledWith({ current: 0 })
-  inc()
+  fireEvent.click(el.getByTestId('increment'))
   expect(fn).toHaveBeenLastCalledWith({ current: 0 })
 });
 
@@ -310,25 +311,23 @@ test('Should work useImperativeHandle hook', () => {
     const { ref, setU, setV } = useBetween(useStore)
     return (
       <>
-        <i>{ref.current}</i>
-        <button onClick={() => setU(u => u + 1)} />
-        <button onClick={() => setV(v => v + 1)} />
+        <i data-testid="ref-value">{ref.current}</i>
+        <button data-testid="set-u" onClick={() => setU(u => u + 1)} />
+        <button data-testid="set-v" onClick={() => setV(v => v + 1)} />
       </>
     )
   }
-  const el = mount(<A />)
-  const i = () => el.find('i').text()
-  const setU = () => el.find('button').at(0).simulate('click')
-  const setV = () => el.find('button').at(1).simulate('click')
+  const el = render(<A />)
+  const getRefValue = () => el.getByTestId('ref-value').textContent
 
   expect(fn).toBeCalledWith(5)
-  expect(i()).toBe('0')
-  setV()
-  expect(i()).toBe('1')
-  setV()
-  expect(i()).toBe('2')
-  setU()
-  expect(i()).toBe('2')
+  expect(getRefValue()).toBe('0')
+  fireEvent.click(el.getByTestId('set-v'))
+  expect(getRefValue()).toBe('1')
+  fireEvent.click(el.getByTestId('set-v'))
+  expect(getRefValue()).toBe('2')
+  fireEvent.click(el.getByTestId('set-u'))
+  expect(getRefValue()).toBe('2')
 });
 
 test('Should work useImperativeHandle hook with callback ref', () => {
@@ -344,15 +343,14 @@ test('Should work useImperativeHandle hook with callback ref', () => {
     const { setV } = useBetween(useStore)
     return (
       <>
-        <button onClick={() => setV(v => v + 1)} />
+        <button data-testid="set-v" onClick={() => setV(v => v + 1)} />
       </>
     )
   }
-  const el = mount(<A />)
-  const setV = () => el.find('button').at(0).simulate('click')
+  const el = render(<A />)
 
   expect(ref).toBeCalledWith(1)
-  setV()
+  fireEvent.click(el.getByTestId('set-v'))
   expect(ref).toHaveBeenLastCalledWith(2)
 });
 
@@ -372,7 +370,7 @@ test('Should throw exception for useContext hook', () => {
   }
 
   expect(() => {
-    mount(<A />)
+    render(<A />)
   }).toThrow('Hook "useContext" no possible to using inside useBetween scope.')
 
   expect(log).toHaveBeenCalledWith('Hook "useContext" no possible to using inside useBetween scope.')

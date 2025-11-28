@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { render } from '@testing-library/react'
-import { mount } from 'enzyme'
 import { clear, get, useBetween } from '../src'
 
 
@@ -53,9 +52,10 @@ it('Effect should update state during hooks creation', async () => {
 
   const el = render(<A />)
   expect((await el.findByTestId('loading')).textContent).toBe('loading')
+  el.unmount()
 
   clear()
-  const ol = mount(<A />)
-  expect(ol.find('i').text()).toBe('loading')
+  const ol = render(<A />)
+  expect((await ol.findByTestId('loading')).textContent).toBe('loading')
 })
 

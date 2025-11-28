@@ -1,11 +1,16 @@
 {
   "rootDir": ".",
-  "setupFiles": ["<rootDir>/jest.setup-once.ts"],
+  "testEnvironment": "jsdom",
+  "setupFilesAfterEnv": ["<rootDir>/jest.setup-once.ts"],
   "testMatch": [
     "<rootDir>/tests/**/*.ts*"
   ],
   "moduleNameMapper": {
     "~/(.*)$": "<rootDir>/src/$1"
   },
-  "verbose": true
+  "verbose": true,
+  "collectCoverageFrom": [
+    "src/**/*.{ts,tsx}",
+    "!src/**/*.d.ts"
+  ]
 }
