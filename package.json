@@ -39,7 +39,7 @@
     "/release"
   ],
   "peerDependencies": {
-    "react": ">=18.0.0"
+    "react": ">=16.8.0"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.23.6",
